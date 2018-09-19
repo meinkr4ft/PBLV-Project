@@ -12,6 +12,9 @@ python -m arcade.examples.instruction_and_game_over_screens
 import arcade
 import random
 import os
+import shot
+import enemy
+
 
 SPRITE_SCALING = 0.5
 SPRITE_NATIVE_SIZE = 128
@@ -61,9 +64,12 @@ class MyGame(arcade.Window):
         self.current_state = INSTRUCTIONS_PAGE
         self.current_menu = 0
 
+        self.frame_count = 0
         self.player_list = None
         self.coin_list = None
         self.wall_list = None
+        self.enemy_list = None
+        self.bullet_list = None
 
         # Set up the player
         self.score = 0
@@ -88,8 +94,11 @@ class MyGame(arcade.Window):
         """
         # Sprite lists
         self.player_list = arcade.SpriteList()
-        self.coin_list = arcade.SpriteList()
+        #self.coin_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
+        self.enemy_list = arcade.SpriteList()
+        self.bullet_list = arcade.SpriteList()
+
 
         # Draw the walls on the bottom
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
@@ -111,23 +120,18 @@ class MyGame(arcade.Window):
                                                              self.wall_list,
                                                              gravity_constant=GRAVITY)
 
-        for i in range(50):
-
-            # Create the coin instance
-            coin = arcade.Sprite("images/coin_01.png", SPRITE_SCALING / 3)
-
-            # Position the coin
-            coin.center_x = random.randrange(SCREEN_WIDTH)
-            coin.center_y = random.randrange(self.wall_list[0].height, SCREEN_HEIGHT -100)
-
-            # Add the coin to the lists
-            self.coin_list.append(coin)
+        #set up enemy
+        en = enemy.Enemy()
+        en.center_x = 400
+        en.center_y = 50
+        self.enemy_list.append(en)
 
         # Don't show the mouse cursor
         self.set_mouse_visible(False)
 
     # STEP 2: Add this function.
     def draw_instructions_page(self):
+
         """
         Draw an instruction page. Load the page as an image.
         """
@@ -149,10 +153,12 @@ class MyGame(arcade.Window):
 
     # STEP 3: Add this function
     def draw_game_over(self):
+
         """
         Draw "Game over" across the screen.
         """
         output = "Game Over"
+
         arcade.draw_text(output, 240, 400, arcade.color.WHITE, 54)
 
         output = "Click to restart"
@@ -166,9 +172,14 @@ class MyGame(arcade.Window):
         Draw all the sprites, along with the score.
         """
         # Draw all the sprites.
+        self.frame_count = self.frame_count + 1
         self.wall_list.draw()
         self.player_list.draw()
-        self.coin_list.draw()
+        self.enemy_list.draw()
+        self.bullet_list.draw()
+        if self.frame_count%120 == 0:
+            for en in self.enemy_list:
+                self.bullet_list.append(shot.Shot(en.direction,en.center_x,en.center_y))
 
         # Put the text on the screen.
         output = f"Score: {self.score}"
@@ -215,11 +226,6 @@ class MyGame(arcade.Window):
         if direction == 1 and self.current_menu < 2:
             self.current_menu = self.current_menu + 1
 
-
-
-    def on_mouse_motion(self, x, y, dx, dy):
-        pass
-
     def on_key_press(self, key, modifiers):
         if self.current_state == INSTRUCTIONS_PAGE:
             if key == arcade.key.UP or key == arcade.key.W:
@@ -227,8 +233,9 @@ class MyGame(arcade.Window):
             elif key == arcade.key.DOWN or key == arcade.key.S:
                 self.operate_menu(1)
             elif key == arcade.key.ENTER:
-                self.setup()
-                self.current_state = GAME_RUNNING
+                if self.current_menu == 0:
+                    self.setup()
+                    self.current_state = GAME_RUNNING
 
         elif self.current_state == GAME_RUNNING:
             if key == arcade.key.UP or key == arcade.key.W:
@@ -255,25 +262,22 @@ class MyGame(arcade.Window):
         if self.current_state == GAME_RUNNING:
             # Call update on all sprites (The sprites don't do much in this
             # example though.)
-            self.coin_list.update()
+
             self.player_list.update()
             self.wall_list.update()
+            self.bullet_list.update()
+            self.enemy_list.update()
 
             # Generate a list of all sprites that collided with the player.
-            hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.coin_list)
+           # hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.coin_list)
 
             self.physics_engine.update()
             # Loop through each colliding sprite, remove it, and add to the
             # score.
-            for coin in hit_list:
-                coin.kill()
-                self.score += 1
+
 
             # If we've collected all the games, then move to a "GAME_OVER"
             # state.
-            if len(self.coin_list) == 0:
-                self.current_state = GAME_OVER
-                self.set_mouse_visible(True)
 
 
 def main():
