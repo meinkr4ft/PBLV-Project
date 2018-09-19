@@ -13,12 +13,13 @@ import arcade
 import random
 import os
 
-SPRITE_SCALING = 0.5
+BLOCK_SIZE = 30
+SPRITE_SCALING = 1
 SPRITE_NATIVE_SIZE = 128
 SPRITE_SIZE = int(SPRITE_NATIVE_SIZE * SPRITE_SCALING)
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 30*BLOCK_SIZE
+SCREEN_HEIGHT = 20*BLOCK_SIZE
 
 # How many pixels to keep as a minimum margin between the character
 # and the edge of the screen.
@@ -26,9 +27,9 @@ VIEWPORT_MARGIN = 40
 RIGHT_MARGIN = 150
 
 # Physics
-MOVEMENT_SPEED = 5
-JUMP_SPEED = 14
-GRAVITY = 0.5
+MOVEMENT_SPEED = 2.5
+JUMP_SPEED = 5
+GRAVITY = 0.25
 
 # These numbers represent "states" that the game can be in.
 INSTRUCTIONS_PAGE = 0
@@ -91,20 +92,33 @@ class MyGame(arcade.Window):
         self.coin_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
 
-        # Draw the walls on the bottom
-        for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
-            wall = arcade.Sprite("images/wall.png", 4*SPRITE_SCALING)
+        # Draw the walls on the bottom and top
+        for y in(0, SCREEN_HEIGHT - BLOCK_SIZE):
+            for x in range(0, SCREEN_WIDTH, BLOCK_SIZE):
+                wall = arcade.Sprite("images/wall.png")
 
-            wall.bottom = 0
-            wall.left = x
-            self.wall_list.append(wall)
+                wall.left = x
+                wall.bottom = y
+                self.wall_list.append(wall)
 
+        # Draw the walls on the side
+        for x in (0, SCREEN_WIDTH - BLOCK_SIZE):
+            for y in range(BLOCK_SIZE, SCREEN_HEIGHT - BLOCK_SIZE, BLOCK_SIZE):
+                if (y != 4*BLOCK_SIZE and y != 5*BLOCK_SIZE) or x==0:
+                    wall = arcade.Sprite("images/wall.png")
+                    wall.left = x;
+                    wall.bottom = y
+                    self.wall_list.append(wall)
+        wall = arcade.Sprite("images/coin_01.png")
+        wall.center_x = 300
+        wall.bottom = BLOCK_SIZE
+        self.wall_list.append(wall)
 
         # Set up the player
         self.score = 0
-        self.player_sprite = arcade.Sprite("images/character.png", SPRITE_SCALING)
-        self.player_sprite.center_x = 50
-        self.player_sprite.center_y = 50
+        self.player_sprite = arcade.Sprite("images/character.png")
+        self.player_sprite.center_x = 2*BLOCK_SIZE
+        self.player_sprite.center_y = 2*BLOCK_SIZE
         self.player_list.append(self.player_sprite)
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
@@ -117,8 +131,8 @@ class MyGame(arcade.Window):
             coin = arcade.Sprite("images/coin_01.png", SPRITE_SCALING / 3)
 
             # Position the coin
-            coin.center_x = random.randrange(SCREEN_WIDTH)
-            coin.center_y = random.randrange(self.wall_list[0].height, SCREEN_HEIGHT -100)
+            coin.center_x = random.randrange(BLOCK_SIZE, SCREEN_WIDTH - BLOCK_SIZE)
+            coin.center_y = random.randrange(BLOCK_SIZE, SCREEN_HEIGHT - BLOCK_SIZE)
 
             # Add the coin to the lists
             self.coin_list.append(coin)
@@ -195,17 +209,6 @@ class MyGame(arcade.Window):
         else:
             self.draw_game()
             self.draw_game_over()
-
-    # STEP 6: Do something like adding this to your on_mouse_press to flip
-    # between instruction pages.
-    def on_key_press(self, key, modifiers):
-        """Called whenever a key is pressed. """
-        #For the menu
-        if self.current_state == INSTRUCTIONS_PAGE:
-            if key == arcade.key.UP or key == arcade.key.W:
-                self.operate_menu(0)
-            elif key == arcade.key.DOWN or key == arcade.key.S:
-                self.operate_menu(1)
 
 
     # change selected menu point 0 = up 1 = down
