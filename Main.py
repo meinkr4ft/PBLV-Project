@@ -31,10 +31,10 @@ JUMP_SPEED = 14
 GRAVITY = 0.5
 
 # These numbers represent "states" that the game can be in.
-INSTRUCTIONS_PAGE_0 = 0
-INSTRUCTIONS_PAGE_1 = 1
-GAME_RUNNING = 2
-GAME_OVER = 3
+INSTRUCTIONS_PAGE = 0
+GAME_RUNNING = 1
+GAME_OVER = 2
+MENU_LENGHT = 3
 
 
 class MyGame(arcade.Window):
@@ -58,7 +58,8 @@ class MyGame(arcade.Window):
         arcade.set_background_color(arcade.color.AMAZON)
 
         # Start 'state' will be showing the first page of instructions.
-        self.current_state = INSTRUCTIONS_PAGE_0
+        self.current_state = INSTRUCTIONS_PAGE
+        self.current_menu = 0
 
         self.player_list = None
         self.coin_list = None
@@ -76,12 +77,10 @@ class MyGame(arcade.Window):
         # matches the dimensions of the window, or it will stretch and look
         # ugly. You can also do something similar if you want a page between
         # each level.
-        self.instructions = []
-        texture = arcade.load_texture("images/instructions_0.png")
-        self.instructions.append(texture)
 
-        texture = arcade.load_texture("images/instructions_1.png")
-        self.instructions.append(texture)
+
+        self.instructions =  arcade.load_texture("images/background.png")
+
 
     def setup(self):
         """
@@ -128,14 +127,24 @@ class MyGame(arcade.Window):
         self.set_mouse_visible(False)
 
     # STEP 2: Add this function.
-    def draw_instructions_page(self, page_number):
+    def draw_instructions_page(self):
         """
         Draw an instruction page. Load the page as an image.
         """
-        page_texture = self.instructions[page_number]
-        arcade.draw_texture_rectangle(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2,
-                                      page_texture.width,
-                                      page_texture.height, page_texture, 0)
+        page_texture = self.instructions
+        if self.current_menu == 0:
+            arcade.draw_text("Start", 240, 400, arcade.color.RED, 54)
+            arcade.draw_text("Options", 240, 340, arcade.color.WHITE, 54)
+            arcade.draw_text("About", 240, 280, arcade.color.WHITE, 54)
+        elif self.current_menu == 1:
+            arcade.draw_text("Start", 240, 400, arcade.color.WHITE, 54)
+            arcade.draw_text("Options", 240, 340, arcade.color.RED, 54)
+            arcade.draw_text("About", 240, 280, arcade.color.WHITE, 54)
+        elif self.current_menu == 2:
+            arcade.draw_text("Start", 240, 400, arcade.color.WHITE, 54)
+            arcade.draw_text("Options", 240, 340, arcade.color.WHITE, 54)
+            arcade.draw_text("About", 240, 280, arcade.color.RED, 54)
+
 
 
     # STEP 3: Add this function
@@ -175,11 +184,10 @@ class MyGame(arcade.Window):
         # This command has to happen before we start drawing
         arcade.start_render()
 
-        if self.current_state == INSTRUCTIONS_PAGE_0:
-            self.draw_instructions_page(0)
+        if self.current_state == INSTRUCTIONS_PAGE:
+            self.draw_instructions_page()
 
-        elif self.current_state == INSTRUCTIONS_PAGE_1:
-            self.draw_instructions_page(1)
+
 
         elif self.current_state == GAME_RUNNING:
             self.draw_game()
@@ -190,23 +198,24 @@ class MyGame(arcade.Window):
 
     # STEP 6: Do something like adding this to your on_mouse_press to flip
     # between instruction pages.
-    def on_mouse_press(self, x, y, button, modifiers):
-        """
-        Called when the user presses a mouse button.
-        """
+    def on_key_press(self, key, modifiers):
+        """Called whenever a key is pressed. """
+        #For the menu
+        if self.current_state == INSTRUCTIONS_PAGE:
+            if key == arcade.key.UP or key == arcade.key.W:
+                self.operate_menu(0)
+            elif key == arcade.key.DOWN or key == arcade.key.S:
+                self.operate_menu(1)
 
-        # Change states as needed.
-        if self.current_state == INSTRUCTIONS_PAGE_0:
-            # Next page of instructions.
-            self.current_state = INSTRUCTIONS_PAGE_1
-        elif self.current_state == INSTRUCTIONS_PAGE_1:
-            # Start the game
-            self.setup()
-            self.current_state = GAME_RUNNING
-        elif self.current_state == GAME_OVER:
-            # Restart the game.
-            self.setup()
-            self.current_state = GAME_RUNNING
+
+    # change selected menu point 0 = up 1 = down
+    def operate_menu(self,direction):
+        if direction == 0 and self.current_menu > 0:
+            self.current_menu = self.current_menu - 1
+        if direction == 1 and self.current_menu < 2:
+            self.current_menu = self.current_menu + 1
+
+
 
     def on_mouse_motion(self, x, y, dx, dy):
         pass
@@ -229,6 +238,8 @@ class MyGame(arcade.Window):
     # STEP 7: Only update if the game state is GAME_RUNNING like below:
     def update(self, delta_time):
         """ Movement and game logic """
+        if self.current_state == INSTRUCTIONS_PAGE:
+            self.draw_instructions_page()
 
         # Only move and do things if the game is running.
         if self.current_state == GAME_RUNNING:
