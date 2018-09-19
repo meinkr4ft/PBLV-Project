@@ -221,13 +221,23 @@ class MyGame(arcade.Window):
         pass
 
     def on_key_press(self, key, modifiers):
-        if key == arcade.key.UP or key == arcade.key.W:
-            if self.physics_engine.can_jump():
-                self.player_sprite.change_y = JUMP_SPEED
-        elif key == arcade.key.LEFT or key == arcade.key.A:
-            self.player_sprite.change_x = - MOVEMENT_SPEED
-        elif key == arcade.key.RIGHT or key == arcade.key.D:
-            self.player_sprite.change_x = MOVEMENT_SPEED
+        if self.current_state == INSTRUCTIONS_PAGE:
+            if key == arcade.key.UP or key == arcade.key.W:
+                self.operate_menu(0)
+            elif key == arcade.key.DOWN or key == arcade.key.S:
+                self.operate_menu(1)
+            elif key == arcade.key.ENTER:
+                self.setup()
+                self.current_state = GAME_RUNNING
+
+        elif self.current_state == GAME_RUNNING:
+            if key == arcade.key.UP or key == arcade.key.W:
+                if self.physics_engine.can_jump():
+                    self.player_sprite.change_y = JUMP_SPEED
+            elif key == arcade.key.LEFT or key == arcade.key.A:
+                self.player_sprite.change_x = - MOVEMENT_SPEED
+            elif key == arcade.key.RIGHT or key == arcade.key.D:
+                self.player_sprite.change_x = MOVEMENT_SPEED
 
     def on_key_release(self, key, modifiers):
         # TODO - Cancel movement only when no key is pressed at all
