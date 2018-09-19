@@ -14,9 +14,21 @@ import random
 import os
 
 SPRITE_SCALING = 0.5
+SPRITE_NATIVE_SIZE = 128
+SPRITE_SIZE = int(SPRITE_NATIVE_SIZE * SPRITE_SCALING)
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
+
+# How many pixels to keep as a minimum margin between the character
+# and the edge of the screen.
+VIEWPORT_MARGIN = 40
+RIGHT_MARGIN = 150
+
+# Physics
+MOVEMENT_SPEED = 5
+JUMP_SPEED = 14
+GRAVITY = 0.5
 
 # These numbers represent "states" that the game can be in.
 INSTRUCTIONS_PAGE_0 = 0
@@ -50,10 +62,15 @@ class MyGame(arcade.Window):
 
         self.player_list = None
         self.coin_list = None
+        self.wall_list = None
 
         # Set up the player
         self.score = 0
         self.player_sprite = None
+        self.physics_engine = None
+        self.view_left = 0
+        self.view_bottom = 0
+        self.game_over = False
 
         # STEP 1: Put each instruction page in an image. Make sure the image
         # matches the dimensions of the window, or it will stretch and look
@@ -73,6 +90,16 @@ class MyGame(arcade.Window):
         # Sprite lists
         self.player_list = arcade.SpriteList()
         self.coin_list = arcade.SpriteList()
+        self.wall_list = arcade.SpriteList()
+
+        # Draw the walls on the bottom
+        for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
+            wall = arcade.Sprite("images/wall.png", 4*SPRITE_SCALING)
+
+            wall.bottom = 0
+            wall.left = x
+            self.wall_list.append(wall)
+
 
         # Set up the player
         self.score = 0
@@ -81,6 +108,10 @@ class MyGame(arcade.Window):
         self.player_sprite.center_y = 50
         self.player_list.append(self.player_sprite)
 
+        self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
+                                                             self.wall_list,
+                                                             gravity_constant=GRAVITY)
+
         for i in range(50):
 
             # Create the coin instance
@@ -88,7 +119,7 @@ class MyGame(arcade.Window):
 
             # Position the coin
             coin.center_x = random.randrange(SCREEN_WIDTH)
-            coin.center_y = random.randrange(SCREEN_HEIGHT)
+            coin.center_y = random.randrange(self.wall_list[0].height, SCREEN_HEIGHT -100)
 
             # Add the coin to the lists
             self.coin_list.append(coin)
@@ -126,6 +157,7 @@ class MyGame(arcade.Window):
         Draw all the sprites, along with the score.
         """
         # Draw all the sprites.
+        self.wall_list.draw()
         self.player_list.draw()
         self.coin_list.draw()
 
@@ -177,13 +209,22 @@ class MyGame(arcade.Window):
             self.current_state = GAME_RUNNING
 
     def on_mouse_motion(self, x, y, dx, dy):
-        """
-        Called whenever the mouse moves.
-        """
-        # Only move the user if the game is running.
-        if self.current_state == GAME_RUNNING:
-            self.player_sprite.center_x = x
-            self.player_sprite.center_y = y
+        pass
+
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.UP or key == arcade.key.W:
+            if self.physics_engine.can_jump():
+                self.player_sprite.change_y = JUMP_SPEED
+        elif key == arcade.key.LEFT or key == arcade.key.A:
+            self.player_sprite.change_x = - MOVEMENT_SPEED
+        elif key == arcade.key.RIGHT or key == arcade.key.D:
+            self.player_sprite.change_x = MOVEMENT_SPEED
+
+    def on_key_release(self, key, modifiers):
+        # TODO - Cancel movement only when no key is pressed at all
+        if key == arcade.key.LEFT or key == arcade.key.RIGHT\
+                or key == arcade.key.A or key == arcade.key.D:
+            self.player_sprite.change_x = 0
 
     # STEP 7: Only update if the game state is GAME_RUNNING like below:
     def update(self, delta_time):
@@ -195,10 +236,12 @@ class MyGame(arcade.Window):
             # example though.)
             self.coin_list.update()
             self.player_list.update()
+            self.wall_list.update()
 
             # Generate a list of all sprites that collided with the player.
             hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.coin_list)
 
+            self.physics_engine.update()
             # Loop through each colliding sprite, remove it, and add to the
             # score.
             for coin in hit_list:
