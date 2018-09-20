@@ -223,18 +223,9 @@ class MyGame(arcade.Window):
         file_path = os.path.dirname(os.path.abspath(__file__))
         os.chdir(file_path)
 
-        # start some music
-
-
-        # Set the background color
-        self.background = arcade.load_texture("images/title_screen_background.png")
-        theme = arcade.sound.load_sound("sounds/Theme.wav")
-        arcade.sound.play_sound(theme)
-
         # Start 'state' will be showing the first page of instructions.
         self.current_state = INSTRUCTIONS_PAGE
         self.current_menu = 0
-
         self.current_room = 0
 
         # Set up the player
@@ -243,6 +234,7 @@ class MyGame(arcade.Window):
         self.physics_engine = None
         self.view_left = 0
         self.view_bottom = 0
+
         self.DOUBLE_JUMP_AVAILABLE = False
         self.game_over = False
         self.rooms = None
