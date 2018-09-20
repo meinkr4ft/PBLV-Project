@@ -47,7 +47,9 @@ class MyGame(arcade.Window):
         os.chdir(file_path)
 
         # Set the background color
-        arcade.set_background_color()
+        arcade.set_background_color(arcade.color.AFRICAN_VIOLET)
+        theme = arcade.sound.load_sound("sounds/Theme.wav")
+        arcade.sound.play_sound(theme)
 
         # Start 'state' will be showing the first page of instructions.
         self.current_state = INSTRUCTIONS_PAGE
@@ -205,6 +207,8 @@ class MyGame(arcade.Window):
 
     # change selected menu point 0 = up 1 = down
     def operate_menu(self,direction):
+        sound = arcade.sound.load_sound("sounds/menu.wav")
+        arcade.sound.play_sound(sound)
         if direction == 0 and self.current_menu > 0:
             self.current_menu = self.current_menu - 1
         if direction == 1 and self.current_menu < 2:
@@ -241,6 +245,7 @@ class MyGame(arcade.Window):
         """ Movement and game logic """
         if self.current_state == INSTRUCTIONS_PAGE:
             self.draw_instructions_page()
+
 
         # Only move and do things if the game is running.
         if self.current_state == GAME_RUNNING:
