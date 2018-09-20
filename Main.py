@@ -1,14 +1,3 @@
-"""
-This program shows how to:
-  * Have one or more instruction screens
-  * Show a 'Game over' text and halt the game
-  * Allow the user to restart the game
-
-
-If Python and Arcade are installed, this example can be run from the command line with:
-python -m arcade.examples.instruction_and_game_over_screens
-"""
-
 import arcade
 import random
 import os
@@ -58,7 +47,7 @@ class MyGame(arcade.Window):
         os.chdir(file_path)
 
         # Set the background color
-        arcade.set_background_color(arcade.color.AMAZON)
+        arcade.set_background_color()
 
         # Start 'state' will be showing the first page of instructions.
         self.current_state = INSTRUCTIONS_PAGE
@@ -94,7 +83,6 @@ class MyGame(arcade.Window):
         """
         # Sprite lists
         self.player_list = arcade.SpriteList()
-        #self.coin_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
         self.enemy_list = arcade.SpriteList()
         self.bullet_list = arcade.SpriteList()
@@ -116,16 +104,16 @@ class MyGame(arcade.Window):
         self.player_sprite.center_y = 50
         self.player_list.append(self.player_sprite)
 
-        self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
-                                                             self.wall_list,
-                                                             gravity_constant=GRAVITY)
+
 
         #set up enemy
         en = enemy.Enemy()
         en.center_x = 400
         en.center_y = 50
         self.enemy_list.append(en)
-
+        self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
+                                                             self.wall_list,
+                                                             gravity_constant=GRAVITY)
         # Don't show the mouse cursor
         self.set_mouse_visible(False)
 
@@ -173,13 +161,18 @@ class MyGame(arcade.Window):
         """
         # Draw all the sprites.
         self.frame_count = self.frame_count + 1
+        self.bullet_list.draw()
         self.wall_list.draw()
         self.player_list.draw()
         self.enemy_list.draw()
-        self.bullet_list.draw()
+
         if self.frame_count%120 == 0:
             for en in self.enemy_list:
                 self.bullet_list.append(shot.Shot(en.direction,en.center_x,en.center_y))
+
+        if self.frame_count % 240 == 0:
+           for en in self.enemy_list:
+            en.change_direction()
 
         # Put the text on the screen.
         output = f"Score: {self.score}"
@@ -209,15 +202,6 @@ class MyGame(arcade.Window):
 
     # STEP 6: Do something like adding this to your on_mouse_press to flip
     # between instruction pages.
-    def on_key_press(self, key, modifiers):
-        """Called whenever a key is pressed. """
-        #For the menu
-        if self.current_state == INSTRUCTIONS_PAGE:
-            if key == arcade.key.UP or key == arcade.key.W:
-                self.operate_menu(0)
-            elif key == arcade.key.DOWN or key == arcade.key.S:
-                self.operate_menu(1)
-
 
     # change selected menu point 0 = up 1 = down
     def operate_menu(self,direction):
@@ -262,7 +246,10 @@ class MyGame(arcade.Window):
         if self.current_state == GAME_RUNNING:
             # Call update on all sprites (The sprites don't do much in this
             # example though.)
-
+            hit_list = arcade.check_for_collision_with_list(self.player_list[0], self.bullet_list)
+            self.score = self.score + hit_list.__len__()
+            for bullet in hit_list:
+                bullet.kill()
             self.player_list.update()
             self.wall_list.update()
             self.bullet_list.update()

@@ -30,6 +30,7 @@ class Enemy(arcade.Sprite):
 
 
     def update(self):
+        self.change_x = ENEMY_SPEED * self.direction
         self.center_x += self.change_x
         self.center_y += self.change_y
 
@@ -49,3 +50,5 @@ class Enemy(arcade.Sprite):
         elif self.top > SCREEN_HEIGHT - 1:
             self.top = SCREEN_HEIGHT - 1
 
+    def change_direction(self):
+        self.direction = self.direction * -1
