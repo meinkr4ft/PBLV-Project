@@ -244,6 +244,8 @@ class MyGame(arcade.Window):
         self.view_left = 0
         self.view_bottom = 0
         self.DOUBLE_JUMP_AVAILABLE = False
+        self.LEFT_PRESSED = False
+        self.RIGHT_PRESSED = False
         self.game_over = False
         self.rooms = None
 
@@ -381,8 +383,10 @@ class MyGame(arcade.Window):
                     self.DOUBLE_JUMP_AVAILABLE = False
                     self.player_sprite.change_y = SECOND_JUMP_SPEED
             elif key == arcade.key.LEFT or key == arcade.key.A:
+                self.LEFT_PRESSED = True
                 self.player_sprite.change_x = - MOVEMENT_SPEED
             elif key == arcade.key.RIGHT or key == arcade.key.D:
+                self.RIGHT_PRESSED = True
                 self.player_sprite.change_x = MOVEMENT_SPEED
             elif key == WEAPON_SWAP_KEY:
                 self.status_bar.selected +=1
@@ -391,9 +395,18 @@ class MyGame(arcade.Window):
 
     def on_key_release(self, key, modifiers):
         # TODO - Cancel movement only when no key is pressed at all
-        if key == arcade.key.LEFT or key == arcade.key.RIGHT \
-                or key == arcade.key.A or key == arcade.key.D:
-            self.player_sprite.change_x = 0
+        if key == arcade.key.LEFT or key == arcade.key.A:
+            self.LEFT_PRESSED = False
+            if not self.RIGHT_PRESSED:
+                self.player_sprite.change_x = 0
+            else:
+                self.player_sprite.change_x = MOVEMENT_SPEED
+        elif key == arcade.key.RIGHT or key == arcade.key.D:
+            self.RIGHT_PRESSED = False
+            if not self.LEFT_PRESSED:
+                self.player_sprite.change_x = 0
+            else:
+                self.player_sprite.change_x = - MOVEMENT_SPEED
 
     # STEP 7: Only update if the game state is GAME_RUNNING like below:
     def update(self, delta_time):
