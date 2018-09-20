@@ -228,8 +228,8 @@ class MyGame(arcade.Window):
 
         # Set the background color
         self.background = arcade.load_texture("images/title_screen_background.png")
-        theme = arcade.sound.load_sound("sounds/Theme.wav")
-        arcade.sound.play_sound(theme)
+        main_theme = arcade.sound.load_sound("sounds/Theme.wav")
+        arcade.sound.play_sound(main_theme)
 
         # Start 'state' will be showing the first page of instructions.
         self.current_state = INSTRUCTIONS_PAGE
