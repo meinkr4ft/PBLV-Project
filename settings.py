@@ -1,0 +1,31 @@
+import arcade
+
+SPRITE_SCALING = 1
+PLAYER_SCALING = 0.85
+SPRITE_NATIVE_SIZE = 30
+STATUS_BAR_HEIGHT = 40
+SPRITE_SIZE = int(SPRITE_NATIVE_SIZE * SPRITE_SCALING)
+
+SCREEN_WIDTH = 30*SPRITE_NATIVE_SIZE
+GAME_HEIGHT = 20*SPRITE_NATIVE_SIZE
+SCREEN_HEIGHT = GAME_HEIGHT + STATUS_BAR_HEIGHT
+
+# How many pixels to keep as a minimum margin between the character
+# and the edge of the screen.
+VIEWPORT_MARGIN = 40
+RIGHT_MARGIN = 150
+
+# Hotkeys
+WEAPON_SWAP_KEY = arcade.key.T
+
+# Physics
+MOVEMENT_SPEED = 2.5
+JUMP_SPEED = 6
+SECOND_JUMP_SPEED = 4.5
+GRAVITY = 0.25
+
+# These numbers represent "states" that the game can be in.
+INSTRUCTIONS_PAGE = 0
+GAME_RUNNING = 1
+GAME_OVER = 2
+MENU_LENGTH = 3
