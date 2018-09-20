@@ -2,7 +2,7 @@
 
 Idee:
 
-Jump'n'Run game, 2D Scroller implemented with Python Arcade
+2D Platformer implemented with Python Arcade
 
 Features:
   - Menu
