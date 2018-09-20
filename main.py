@@ -15,15 +15,20 @@ import os
 SPRITE_SCALING = 1
 PLAYER_SCALING = 0.85
 SPRITE_NATIVE_SIZE = 30
+STATUS_BAR_HEIGHT = 40
 SPRITE_SIZE = int(SPRITE_NATIVE_SIZE * SPRITE_SCALING)
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 30*SPRITE_NATIVE_SIZE
+GAME_HEIGHT = 20*SPRITE_NATIVE_SIZE
+SCREEN_HEIGHT = GAME_HEIGHT + STATUS_BAR_HEIGHT
 
 # How many pixels to keep as a minimum margin between the character
 # and the edge of the screen.
 VIEWPORT_MARGIN = 40
 RIGHT_MARGIN = 150
+
+# Hotkeys
+WEAPON_SWAP_KEY = arcade.key.T
 
 # Physics
 MOVEMENT_SPEED = 2.5
@@ -37,6 +42,58 @@ GAME_RUNNING = 1
 GAME_OVER = 2
 MENU_LENGTH = 3
 
+class StatusBar:
+    def __init__(self):
+        # status bar values
+        self.lives = 5
+        self.health = 1
+        self.max_health = 3
+        self.health_cap = 10
+        self.key_cap = 10
+        # 3 types of weapons
+        self.selected = 2
+        self.weapon_count = 3
+        self.weapons = [0,1,0]
+
+        self.sprite_list = arcade.SpriteList()
+        self.update_sprites()
+
+    def update_sprites(self):
+        self.sprite_list = arcade.SpriteList()
+        start_index = 0
+        health_remaining = self.health
+        # hearts
+        for i in range(start_index, self.max_health):
+            src = "images/heart_full.png"
+            if health_remaining <= 0:
+                src = "images/heart_empty.png"
+            health_remaining -= 1
+            heart = arcade.Sprite(src)
+            heart.top = SCREEN_HEIGHT
+            heart.left = i*SPRITE_NATIVE_SIZE
+            self.sprite_list.append(heart)
+
+        start_index += self.max_health +1
+        # weapons
+        for i in range(start_index, start_index + self.weapon_count):
+            index = i - start_index
+            src = self.get_weapon_src(index)
+            weapon = arcade.Sprite(src)
+            weapon.top = SCREEN_HEIGHT
+            weapon.left = i*SPRITE_NATIVE_SIZE
+            self.sprite_list.append(weapon)
+
+            if self.selected == index:
+                select_arrow = arcade.Sprite("images/select_arrow.png")
+                select_arrow.top = SCREEN_HEIGHT - SPRITE_NATIVE_SIZE
+                select_arrow.left = weapon.left
+                self.sprite_list.append(select_arrow)
+
+    def get_weapon_src(self, slot):
+        if self.weapons[slot] == 0:
+            return "images/weapon_empty.png"
+        elif self.weapons[slot] == 1:
+            return "images/dummy_weapon.png"
 
 class Room:
     """
@@ -51,6 +108,11 @@ class Room:
         # This holds the background images. If you don't want changing
         # background images, you can delete this part.
         self.background = None
+
+
+def draw_background(background):
+    arcade.draw_texture_rectangle(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2,
+                                  SCREEN_WIDTH, SCREEN_HEIGHT, background)
 
 
 def setup_room_1():
@@ -68,7 +130,7 @@ def setup_room_1():
     # -- Set up the walls
     # Create bottom and top row of boxes
     # This y loops a list of two, the coordinate 0, and just under the top of window
-    for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
+    for y in (0, GAME_HEIGHT - SPRITE_SIZE):
         # Loop for each box going across
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             wall = arcade.Sprite("images/wall.png", SPRITE_SCALING)
@@ -79,7 +141,7 @@ def setup_room_1():
     # Create left and right column of boxes
     for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
         # Loop for each box going across
-        for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
+        for y in range(SPRITE_SIZE, GAME_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
             # Skip making a block 4 and 5 blocks up on the right side
             if (y != SPRITE_SIZE * 4 and y != SPRITE_SIZE * 5) or x == 0:
                 wall = arcade.Sprite("images/wall.png", SPRITE_SCALING)
@@ -113,7 +175,7 @@ def setup_room_2():
     # -- Set up the walls
     # Create bottom and top row of boxes
     # This y loops a list of two, the coordinate 0, and just under the top of window
-    for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
+    for y in (0, GAME_HEIGHT - SPRITE_SIZE):
         # Loop for each box going across
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             wall = arcade.Sprite("images/wall.png", SPRITE_SCALING)
@@ -124,7 +186,7 @@ def setup_room_2():
     # Create left and right column of boxes
     for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
         # Loop for each box going across
-        for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
+        for y in range(SPRITE_SIZE, GAME_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
             # Skip making a block 4 and 5 blocks up
             if (y != SPRITE_SIZE * 4 and y != SPRITE_SIZE * 5) or x != 0:
                 wall = arcade.Sprite("images/wall.png", SPRITE_SCALING)
@@ -159,7 +221,7 @@ class MyGame(arcade.Window):
         os.chdir(file_path)
 
         # Set the background color
-        arcade.set_background_color(arcade.color.AMAZON)
+        self.background = arcade.load_texture("images/title_screen_background.png")
 
         # Start 'state' will be showing the first page of instructions.
         self.current_state = INSTRUCTIONS_PAGE
@@ -188,12 +250,16 @@ class MyGame(arcade.Window):
         """
         Set up the game.
         """
+
+
         # Set up the player
         self.score = 0
         self.player_sprite = arcade.Sprite("images/character.png", PLAYER_SCALING)
         self.player_sprite.center_x = 100
         self.player_sprite.center_y = 100
+        self.status_bar = StatusBar()
         self.rooms = []
+
 
         room = setup_room_1()
         self.rooms.append(room)
@@ -247,6 +313,8 @@ class MyGame(arcade.Window):
         output = f"Score: {self.score}"
         arcade.draw_text(output, 10, 20, arcade.color.WHITE, 14)
 
+    def draw_lives(self):
+        pass
     # STEP 5: Update the on_draw function to look like this. Adjust according
     # to the number of instruction pages you have.
     def on_draw(self):
@@ -258,12 +326,16 @@ class MyGame(arcade.Window):
         arcade.start_render()
 
         if self.current_state == INSTRUCTIONS_PAGE:
+            draw_background(self.background)
             self.draw_instructions_page()
 
         elif self.current_state == GAME_RUNNING:
+            draw_background(self.rooms[self.current_room].background)
+            self.status_bar.sprite_list.draw()
             self.rooms[self.current_room].wall_list.draw()
             self.draw_game()
             self.player_sprite.draw()
+            self.draw_lives()
 
         elif self.current_state == GAME_OVER:
             self.draw_game()
@@ -286,6 +358,7 @@ class MyGame(arcade.Window):
             elif key == arcade.key.DOWN or key == arcade.key.S:
                 self.operate_menu(1)
             elif key == arcade.key.ENTER:
+                self.background = None
                 self.setup()
                 self.current_state = GAME_RUNNING
 
@@ -301,6 +374,10 @@ class MyGame(arcade.Window):
                 self.player_sprite.change_x = - MOVEMENT_SPEED
             elif key == arcade.key.RIGHT or key == arcade.key.D:
                 self.player_sprite.change_x = MOVEMENT_SPEED
+            elif key == WEAPON_SWAP_KEY:
+                self.status_bar.selected +=1
+                self.status_bar.selected %=3
+                self.status_bar.update_sprites()
 
     def on_key_release(self, key, modifiers):
         # TODO - Cancel movement only when no key is pressed at all
