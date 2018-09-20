@@ -10,16 +10,15 @@ python -m arcade.examples.instruction_and_game_over_screens
 """
 
 import arcade
-import random
 import os
 
-BLOCK_SIZE = 30
 SPRITE_SCALING = 1
-SPRITE_NATIVE_SIZE = 128
+PLAYER_SCALING = 0.85
+SPRITE_NATIVE_SIZE = 30
 SPRITE_SIZE = int(SPRITE_NATIVE_SIZE * SPRITE_SCALING)
 
-SCREEN_WIDTH = 30*BLOCK_SIZE
-SCREEN_HEIGHT = 20*BLOCK_SIZE
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
 
 # How many pixels to keep as a minimum margin between the character
 # and the edge of the screen.
@@ -29,13 +28,117 @@ RIGHT_MARGIN = 150
 # Physics
 MOVEMENT_SPEED = 2.5
 JUMP_SPEED = 5
+SECOND_JUMP_SPEED = 3.5
 GRAVITY = 0.25
 
 # These numbers represent "states" that the game can be in.
 INSTRUCTIONS_PAGE = 0
 GAME_RUNNING = 1
 GAME_OVER = 2
-MENU_LENGHT = 3
+MENU_LENGTH = 3
+
+
+class Room:
+    """
+    This class holds all the information about the
+    different rooms.
+    """
+
+    def __init__(self):
+        # You may want many lists. Lists for coins, monsters, etc.
+        self.wall_list = None
+
+        # This holds the background images. If you don't want changing
+        # background images, you can delete this part.
+        self.background = None
+
+
+def setup_room_1():
+    """
+    Create and return room 1.
+    If your program gets large, you may want to separate this into different
+    files.
+    """
+    room = Room()
+
+    """ Set up the game and initialize the variables. """
+    # Sprite lists
+    room.wall_list = arcade.SpriteList()
+
+    # -- Set up the walls
+    # Create bottom and top row of boxes
+    # This y loops a list of two, the coordinate 0, and just under the top of window
+    for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
+        # Loop for each box going across
+        for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
+            wall = arcade.Sprite("images/wall.png", SPRITE_SCALING)
+            wall.left = x
+            wall.bottom = y
+            room.wall_list.append(wall)
+
+    # Create left and right column of boxes
+    for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
+        # Loop for each box going across
+        for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
+            # Skip making a block 4 and 5 blocks up on the right side
+            if (y != SPRITE_SIZE * 4 and y != SPRITE_SIZE * 5) or x == 0:
+                wall = arcade.Sprite("images/wall.png", SPRITE_SCALING)
+                wall.left = x
+                wall.bottom = y
+                room.wall_list.append(wall)
+
+    wall = arcade.Sprite("images/wall.png", SPRITE_SCALING)
+    wall.left = 23 * SPRITE_SIZE
+    wall.bottom = 2 * SPRITE_SIZE
+    room.wall_list.append(wall)
+
+    # If you want coins or monsters in a level, then add that code here.
+
+    # Load the background image for this level.
+    room.background = arcade.load_texture("images/background.png")
+
+    return room
+
+
+def setup_room_2():
+    """
+    Create and return room 2.
+    """
+    room = Room()
+
+    """ Set up the game and initialize the variables. """
+    # Sprite lists
+    room.wall_list = arcade.SpriteList()
+
+    # -- Set up the walls
+    # Create bottom and top row of boxes
+    # This y loops a list of two, the coordinate 0, and just under the top of window
+    for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
+        # Loop for each box going across
+        for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
+            wall = arcade.Sprite("images/wall.png", SPRITE_SCALING)
+            wall.left = x
+            wall.bottom = y
+            room.wall_list.append(wall)
+
+    # Create left and right column of boxes
+    for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
+        # Loop for each box going across
+        for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
+            # Skip making a block 4 and 5 blocks up
+            if (y != SPRITE_SIZE * 4 and y != SPRITE_SIZE * 5) or x != 0:
+                wall = arcade.Sprite("images/wall.png", SPRITE_SCALING)
+                wall.left = x
+                wall.bottom = y
+                room.wall_list.append(wall)
+
+    wall = arcade.Sprite("images/wall.png", SPRITE_SCALING)
+    wall.left = 2 * SPRITE_SIZE
+    wall.bottom = 2 * SPRITE_SIZE
+    room.wall_list.append(wall)
+    room.background = arcade.load_texture("images/background.png")
+
+    return room
 
 
 class MyGame(arcade.Window):
@@ -62,9 +165,7 @@ class MyGame(arcade.Window):
         self.current_state = INSTRUCTIONS_PAGE
         self.current_menu = 0
 
-        self.player_list = None
-        self.coin_list = None
-        self.wall_list = None
+        self.current_room = 0
 
         # Set up the player
         self.score = 0
@@ -72,70 +173,38 @@ class MyGame(arcade.Window):
         self.physics_engine = None
         self.view_left = 0
         self.view_bottom = 0
+        self.DOUBLE_JUMP_AVAILABLE = False
         self.game_over = False
+        self.rooms = None
 
         # STEP 1: Put each instruction page in an image. Make sure the image
         # matches the dimensions of the window, or it will stretch and look
         # ugly. You can also do something similar if you want a page between
         # each level.
 
-
-        self.instructions =  arcade.load_texture("images/background.png")
-
+        self.instructions = arcade.load_texture("images/background.png")
 
     def setup(self):
         """
         Set up the game.
         """
-        # Sprite lists
-        self.player_list = arcade.SpriteList()
-        self.coin_list = arcade.SpriteList()
-        self.wall_list = arcade.SpriteList()
-
-        # Draw the walls on the bottom and top
-        for y in(0, SCREEN_HEIGHT - BLOCK_SIZE):
-            for x in range(0, SCREEN_WIDTH, BLOCK_SIZE):
-                wall = arcade.Sprite("images/wall.png")
-
-                wall.left = x
-                wall.bottom = y
-                self.wall_list.append(wall)
-
-        # Draw the walls on the side
-        for x in (0, SCREEN_WIDTH - BLOCK_SIZE):
-            for y in range(BLOCK_SIZE, SCREEN_HEIGHT - BLOCK_SIZE, BLOCK_SIZE):
-                if (y != 4*BLOCK_SIZE and y != 5*BLOCK_SIZE) or x==0:
-                    wall = arcade.Sprite("images/wall.png")
-                    wall.left = x;
-                    wall.bottom = y
-                    self.wall_list.append(wall)
-        wall = arcade.Sprite("images/coin_01.png")
-        wall.center_x = 300
-        wall.bottom = BLOCK_SIZE
-        self.wall_list.append(wall)
-
         # Set up the player
         self.score = 0
-        self.player_sprite = arcade.Sprite("images/character.png")
-        self.player_sprite.center_x = 2*BLOCK_SIZE
-        self.player_sprite.center_y = 2*BLOCK_SIZE
-        self.player_list.append(self.player_sprite)
+        self.player_sprite = arcade.Sprite("images/character.png", PLAYER_SCALING)
+        self.player_sprite.center_x = 100
+        self.player_sprite.center_y = 100
+        self.rooms = []
+
+        room = setup_room_1()
+        self.rooms.append(room)
+        room = setup_room_2()
+        self.rooms.append(room)
+
+        self.current_room = 0
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
-                                                             self.wall_list,
+                                                             self.rooms[self.current_room].wall_list,
                                                              gravity_constant=GRAVITY)
-
-        for i in range(50):
-
-            # Create the coin instance
-            coin = arcade.Sprite("images/coin_01.png", SPRITE_SCALING / 3)
-
-            # Position the coin
-            coin.center_x = random.randrange(BLOCK_SIZE, SCREEN_WIDTH - BLOCK_SIZE)
-            coin.center_y = random.randrange(BLOCK_SIZE, SCREEN_HEIGHT - BLOCK_SIZE)
-
-            # Add the coin to the lists
-            self.coin_list.append(coin)
 
         # Don't show the mouse cursor
         self.set_mouse_visible(False)
@@ -159,8 +228,6 @@ class MyGame(arcade.Window):
             arcade.draw_text("Options", 240, 340, arcade.color.WHITE, 54)
             arcade.draw_text("About", 240, 280, arcade.color.RED, 54)
 
-
-
     # STEP 3: Add this function
     def draw_game_over(self):
         """
@@ -176,14 +243,6 @@ class MyGame(arcade.Window):
     # on_draw method AFTER the start_render call and MOVE to a new
     # method called draw_game.
     def draw_game(self):
-        """
-        Draw all the sprites, along with the score.
-        """
-        # Draw all the sprites.
-        self.wall_list.draw()
-        self.player_list.draw()
-        self.coin_list.draw()
-
         # Put the text on the screen.
         output = f"Score: {self.score}"
         arcade.draw_text(output, 10, 20, arcade.color.WHITE, 14)
@@ -201,24 +260,21 @@ class MyGame(arcade.Window):
         if self.current_state == INSTRUCTIONS_PAGE:
             self.draw_instructions_page()
 
-
-
         elif self.current_state == GAME_RUNNING:
+            self.rooms[self.current_room].wall_list.draw()
             self.draw_game()
+            self.player_sprite.draw()
 
-        else:
+        elif self.current_state == GAME_OVER:
             self.draw_game()
             self.draw_game_over()
 
-
     # change selected menu point 0 = up 1 = down
-    def operate_menu(self,direction):
+    def operate_menu(self, direction):
         if direction == 0 and self.current_menu > 0:
             self.current_menu = self.current_menu - 1
         if direction == 1 and self.current_menu < 2:
             self.current_menu = self.current_menu + 1
-
-
 
     def on_mouse_motion(self, x, y, dx, dy):
         pass
@@ -236,7 +292,11 @@ class MyGame(arcade.Window):
         elif self.current_state == GAME_RUNNING:
             if key == arcade.key.UP or key == arcade.key.W:
                 if self.physics_engine.can_jump():
+                    self.DOUBLE_JUMP_AVAILABLE = True
                     self.player_sprite.change_y = JUMP_SPEED
+                elif self.DOUBLE_JUMP_AVAILABLE:
+                    self.DOUBLE_JUMP_AVAILABLE = False
+                    self.player_sprite.change_y = SECOND_JUMP_SPEED
             elif key == arcade.key.LEFT or key == arcade.key.A:
                 self.player_sprite.change_x = - MOVEMENT_SPEED
             elif key == arcade.key.RIGHT or key == arcade.key.D:
@@ -244,7 +304,7 @@ class MyGame(arcade.Window):
 
     def on_key_release(self, key, modifiers):
         # TODO - Cancel movement only when no key is pressed at all
-        if key == arcade.key.LEFT or key == arcade.key.RIGHT\
+        if key == arcade.key.LEFT or key == arcade.key.RIGHT \
                 or key == arcade.key.A or key == arcade.key.D:
             self.player_sprite.change_x = 0
 
@@ -256,27 +316,25 @@ class MyGame(arcade.Window):
 
         # Only move and do things if the game is running.
         if self.current_state == GAME_RUNNING:
-            # Call update on all sprites (The sprites don't do much in this
-            # example though.)
-            self.coin_list.update()
-            self.player_list.update()
-            self.wall_list.update()
-
-            # Generate a list of all sprites that collided with the player.
-            hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.coin_list)
 
             self.physics_engine.update()
-            # Loop through each colliding sprite, remove it, and add to the
-            # score.
-            for coin in hit_list:
-                coin.kill()
-                self.score += 1
+            if self.physics_engine.can_jump():
+                self.DOUBLE_JUMP_AVAILABLE = True
 
-            # If we've collected all the games, then move to a "GAME_OVER"
-            # state.
-            if len(self.coin_list) == 0:
-                self.current_state = GAME_OVER
-                self.set_mouse_visible(True)
+            # Do some logic here to figure out what room we are in, and if we need to go
+            # to a different room.
+            if self.player_sprite.center_x > SCREEN_WIDTH and self.current_room == 0:
+                self.current_room = 1
+                self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
+                                                                     self.rooms[self.current_room].wall_list,
+                                                                     gravity_constant=GRAVITY)
+                self.player_sprite.center_x = 0
+            elif self.player_sprite.center_x < 0 and self.current_room == 1:
+                self.current_room = 0
+                self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
+                                                                     self.rooms[self.current_room].wall_list,
+                                                                     gravity_constant=GRAVITY)
+                self.player_sprite.center_x = SCREEN_WIDTH
 
 
 def main():
