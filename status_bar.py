@@ -10,14 +10,14 @@ class StatusBar:
     def __init__(self):
         # status bar values
         self.lives = 5
-        self.health = 1
-        self.max_health = 3
+        self.health = 5
+        self.max_health = 8
         self.health_cap = 10
         self.key_cap = 10
         # 3 types of weapons
         self.selected = 2
         self.weapon_count = 3
-        self.weapons = [0,1,0]
+        self.weapons = [1,1,1]
 
         self.sprite_list = arcade.SpriteList()
         self.update_sprites()

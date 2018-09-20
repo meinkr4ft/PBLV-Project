@@ -84,8 +84,8 @@ class MyGame(arcade.Window):
         # Set up the player
         self.score = 0
         self.player_sprite = arcade.Sprite("images/character.png", settings.PLAYER_SCALING)
-        self.player_sprite.center_x = 100
-        self.player_sprite.center_y = 100
+        self.player_sprite.center_x = 300
+        self.player_sprite.center_y = 300
         self.status_bar = StatusBar()
         self.rooms = []
 
