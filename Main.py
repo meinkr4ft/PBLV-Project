@@ -3,6 +3,7 @@ import random
 import os
 import shot
 import enemy
+import sounds
 
 
 SPRITE_SCALING = 0.5
@@ -48,8 +49,8 @@ class MyGame(arcade.Window):
 
         # Set the background color
         arcade.set_background_color(arcade.color.AFRICAN_VIOLET)
-        theme = arcade.sound.load_sound("sounds/Theme.wav")
-        arcade.sound.play_sound(theme)
+        # Start Theme
+        arcade.sound.play_sound(sounds.theme)
 
         # Start 'state' will be showing the first page of instructions.
         self.current_state = INSTRUCTIONS_PAGE
@@ -121,7 +122,6 @@ class MyGame(arcade.Window):
 
     # STEP 2: Add this function.
     def draw_instructions_page(self):
-
         """
         Draw an instruction page. Load the page as an image.
         """
@@ -171,6 +171,7 @@ class MyGame(arcade.Window):
         if self.frame_count%120 == 0:
             for en in self.enemy_list:
                 self.bullet_list.append(shot.Shot(en.direction,en.center_x,en.center_y))
+                arcade.sound.play_sound(sounds.shot)
 
         if self.frame_count % 240 == 0:
            for en in self.enemy_list:
@@ -207,8 +208,7 @@ class MyGame(arcade.Window):
 
     # change selected menu point 0 = up 1 = down
     def operate_menu(self,direction):
-        sound = arcade.sound.load_sound("sounds/menu.wav")
-        arcade.sound.play_sound(sound)
+        arcade.sound.play_sound(sounds.menu)
         if direction == 0 and self.current_menu > 0:
             self.current_menu = self.current_menu - 1
         if direction == 1 and self.current_menu < 2:
