@@ -82,7 +82,6 @@ class MyGame(arcade.Window):
         """
 
         # Set up the player
-        self.score = 0
         self.player_sprite = arcade.Sprite("images/character.png", settings.PLAYER_SCALING)
         self.player_sprite.center_x = 300
         self.player_sprite.center_y = 300
@@ -138,13 +137,6 @@ class MyGame(arcade.Window):
         output = "Click to restart"
         arcade.draw_text(output, 310, 300, arcade.color.WHITE, 24)
 
-    # STEP 4: Take the drawing code you currently have in your
-    # on_draw method AFTER the start_render call and MOVE to a new
-    # method called draw_game.
-    def draw_game(self):
-        # Put the text on the screen.
-        output = f"Score: {self.score}"
-        arcade.draw_text(output, 10, 20, arcade.color.WHITE, 14)
 
     def draw_lives(self):
         pass
@@ -170,12 +162,10 @@ class MyGame(arcade.Window):
             draw_background(self.rooms[self.current_room].background)
             self.status_bar.sprite_list.draw()
             self.rooms[self.current_room].wall_list.draw()
-            self.draw_game()
             self.player_sprite.draw()
             self.draw_lives()
 
         elif self.current_state == settings.GAME_OVER:
-            self.draw_game()
             self.draw_game_over()
 
     # change selected menu point 0 = up 1 = down
