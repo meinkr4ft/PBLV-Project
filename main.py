@@ -46,7 +46,7 @@ class MyGame(arcade.Window):
 
 
         # Set the background color
-        self.background = arcade.load_texture("images/title_screen_background.png")
+        self.background = arcade.load_texture("images/background4.png")
         main_theme = arcade.sound.load_sound("sounds/Theme.wav")
         arcade.sound.play_sound(main_theme)
 
