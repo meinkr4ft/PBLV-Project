@@ -15,6 +15,7 @@ import settings
 import rooms
 from status_bar import StatusBar
 from room import Room
+import sounds
 
 import shot
 import enemy
@@ -162,7 +163,7 @@ class MyGame(arcade.Window):
 
     # change selected menu point 0 = up 1 = down
     def operate_menu(self, direction):
-        sound = arcade.sound.load_sound("sounds/menu.wav")
+        sound = arcade.sound.load_sound(sounds.menu)
         arcade.sound.play_sound(sound)
         if direction == 0 and self.current_menu > 0:
             self.current_menu = self.current_menu - 1
