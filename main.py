@@ -21,6 +21,7 @@ import shot
 import enemy
 import random
 
+
 def draw_background(background):
     arcade.draw_texture_rectangle(settings.SCREEN_WIDTH // 2, settings.SCREEN_HEIGHT // 2,
                                   settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT, background)
@@ -45,11 +46,10 @@ class MyGame(arcade.Window):
 
         # start some music
 
-
         # Set the background color
         self.background = arcade.load_texture("images/background4.png")
-        main_theme = arcade.sound.load_sound("sounds/Theme.wav")
-        arcade.sound.play_sound(main_theme)
+
+        arcade.sound.play_sound(sounds.theme)
 
         # Start 'state' will be showing the first page of instructions.
         self.current_state = settings.INSTRUCTIONS_PAGE
@@ -81,7 +81,6 @@ class MyGame(arcade.Window):
         Set up the game.
         """
 
-
         # Set up the player
         self.score = 0
         self.player_sprite = arcade.Sprite("images/character.png", settings.PLAYER_SCALING)
@@ -89,7 +88,6 @@ class MyGame(arcade.Window):
         self.player_sprite.center_y = 300
         self.status_bar = StatusBar()
         self.rooms = []
-
 
         room = rooms.setup_room_1()
         self.rooms.append(room)
@@ -124,6 +122,11 @@ class MyGame(arcade.Window):
             arcade.draw_text("Options", 240, 340, arcade.color.WHITE, 54)
             arcade.draw_text("About", 240, 280, arcade.color.RED, 54)
 
+    def draw_pause(self):
+        self.background = arcade.load_texture("images/background4.png")
+        arcade.draw_text("Pause", 240, 400, arcade.color.RED, 70)
+        arcade.draw_text("Enter to Continue", 240, 200, arcade.color.WHITE, 54)
+
     # STEP 3: Add this function
     def draw_game_over(self):
         """
@@ -145,6 +148,7 @@ class MyGame(arcade.Window):
 
     def draw_lives(self):
         pass
+
     # STEP 5: Update the on_draw function to look like this. Adjust according
     # to the number of instruction pages you have.
     def on_draw(self):
@@ -158,6 +162,9 @@ class MyGame(arcade.Window):
         if self.current_state == settings.INSTRUCTIONS_PAGE:
             draw_background(self.background)
             self.draw_instructions_page()
+        if self.current_state == settings.PAUSE:
+            draw_background(self.background)
+            self.draw_pause()
 
         elif self.current_state == settings.GAME_RUNNING:
             draw_background(self.rooms[self.current_room].background)
@@ -189,13 +196,15 @@ class MyGame(arcade.Window):
                 self.operate_menu(0)
             elif key == arcade.key.DOWN or key == arcade.key.S:
                 self.operate_menu(1)
-            elif key == arcade.key.ENTER:
+            elif key == arcade.key.ENTER and self.current_menu == 0:
                 self.background = None
                 self.setup()
                 self.current_state = settings.GAME_RUNNING
 
         elif self.current_state == settings.GAME_RUNNING:
-            if key == arcade.key.UP or key == arcade.key.W:
+            if key == arcade.key.ESCAPE:
+                self.current_state = settings.PAUSE
+            elif key == arcade.key.UP or key == arcade.key.W:
                 if self.physics_engine.can_jump():
                     self.DOUBLE_JUMP_AVAILABLE = True
                     self.player_sprite.change_y = settings.JUMP_SPEED
@@ -209,9 +218,17 @@ class MyGame(arcade.Window):
                 self.RIGHT_PRESSED = True
                 self.player_sprite.change_x = settings.MOVEMENT_SPEED
             elif key == settings.WEAPON_SWAP_KEY:
-                self.status_bar.selected +=1
-                self.status_bar.selected %=3
+                self.status_bar.selected += 1
+                self.status_bar.selected %= 3
                 self.status_bar.update_sprites()
+
+        elif self.current_state == settings.PAUSE:
+            if key == arcade.key.RETURN:
+                self.current_state = settings.GAME_RUNNING
+
+
+    def pause(self):
+        print("r")
 
     def on_key_release(self, key, modifiers):
         # TODO - Cancel movement only when no key is pressed at all
@@ -233,9 +250,11 @@ class MyGame(arcade.Window):
         """ Movement and game logic """
         if self.current_state == settings.INSTRUCTIONS_PAGE:
             self.draw_instructions_page()
+        elif self.current_state == settings.PAUSE:
+            self.draw_pause()
 
         # Only move and do things if the game is running.
-        if self.current_state == settings.GAME_RUNNING:
+        elif self.current_state == settings.GAME_RUNNING:
 
             self.physics_engine.update()
             if self.physics_engine.can_jump():
