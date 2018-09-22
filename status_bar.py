@@ -57,4 +57,4 @@ class StatusBar:
         if self.weapons[slot] == 0:
             return "images/weapon_empty.png"
         elif self.weapons[slot] == 1:
-            return "images/dummy_weapon.png"
+            return "images/Sword1.png"
