@@ -28,9 +28,9 @@ class StatusBar:
         health_remaining = self.health
         # hearts
         for i in range(start_index, self.max_health):
-            src = "images/heart_full.png"
+            src = "images/heart_full1.png"
             if health_remaining <= 0:
-                src = "images/heart_empty.png"
+                src = "images/heart_empty1.png"
             health_remaining -= 1
             heart = arcade.Sprite(src)
             heart.top = SCREEN_HEIGHT
