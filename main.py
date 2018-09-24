@@ -91,6 +91,8 @@ class MyGame(arcade.Window):
         self.rooms.append(room)
         room = rooms.setup_room_2()
         self.rooms.append(room)
+        room = rooms.setup_room_2()
+        self.rooms.append(room)
 
         self.current_room = 0
 
@@ -160,7 +162,9 @@ class MyGame(arcade.Window):
         elif self.current_state == settings.GAME_RUNNING:
             draw_background(self.rooms[self.current_room].background)
             self.status_bar.sprite_list.draw()
-            self.rooms[self.current_room].wall_list.draw()
+            for l in self.rooms[self.current_room].get_lists():
+                l.draw()
+            # self.rooms[self.current_room].wall_list.draw()
             self.player_sprite.draw()
             self.draw_lives()
 
@@ -175,6 +179,12 @@ class MyGame(arcade.Window):
             self.current_menu = self.current_menu - 1
         if direction == 1 and self.current_menu < 2:
             self.current_menu = self.current_menu + 1
+
+    def setup_engine(self):
+        self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
+                                                                         self.rooms[self.current_room].wall_list,
+                                                                         gravity_constant=settings.GRAVITY)
+
 
     def on_mouse_motion(self, x, y, dx, dy):
         pass
@@ -251,17 +261,21 @@ class MyGame(arcade.Window):
 
             # Do some logic here to figure out what room we are in, and if we need to go
             # to a different room.
-            if self.player_sprite.center_x > settings.SCREEN_WIDTH and self.current_room == 0:
-                self.current_room = 1
-                self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
-                                                                     self.rooms[self.current_room].wall_list,
-                                                                     gravity_constant=settings.GRAVITY)
+            if self.player_sprite.center_x > settings.SCREEN_WIDTH:
+                if self.current_room == 0:
+                    self.current_room = 1
+                    self.setup_engine()
+                elif self.current_room == 1:
+                    self.current_room = 2
+                    self.setup_engine()
                 self.player_sprite.center_x = 0
-            elif self.player_sprite.center_x < 0 and self.current_room == 1:
-                self.current_room = 0
-                self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
-                                                                     self.rooms[self.current_room].wall_list,
-                                                                     gravity_constant=settings.GRAVITY)
+            elif self.player_sprite.center_x < 0:
+                if self.current_room == 1:
+                    self.current_room = 0
+                    self.setup_engine()
+                elif self.current_room == 2:
+                    self.current_room = 1
+                    self.setup_engine()
                 self.player_sprite.center_x = settings.SCREEN_WIDTH
 
 
