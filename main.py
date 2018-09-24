@@ -1,14 +1,3 @@
-"""
-This program shows how to:
-  * Have one or more instruction screens
-  * Show a 'Game over' text and halt the game
-  * Allow the user to restart the game
-
-
-If Python and Arcade are installed, this example can be run from the command line with:
-python -m arcade.examples.instruction_and_game_over_screens
-"""
-
 import arcade
 import os
 import settings
@@ -233,10 +222,14 @@ class MyGame(arcade.Window):
             elif key == settings.WEAPON_SWAP_KEY:
                 self.status_bar.selected += 1
                 self.status_bar.selected %= 3
-                self.status_bar.update_sprites()
+
 
         elif self.current_state == settings.PAUSE:
             if key == arcade.key.RETURN:
+                self.current_state = settings.GAME_RUNNING
+        elif self.current_state == settings.GAME_OVER:
+            if key == arcade.key.RETURN:
+                self.setup()
                 self.current_state = settings.GAME_RUNNING
 
 
@@ -265,16 +258,22 @@ class MyGame(arcade.Window):
             self.draw_instructions_page()
         elif self.current_state == settings.PAUSE:
             self.draw_pause()
+        elif self.current_state == settings.GAME_OVER:
+            self.draw_game_over()
 
         # Only move and do things if the game is running.
         elif self.current_state == settings.GAME_RUNNING:
+            self.status_bar.update_sprites()
             self.player_sprite.update_animation()
-
+            self.update_enemys()
+            self.enemy_bullets()
             self.rooms[self.current_room].update()
             self.spikes()
-            hit_list = arcade.check_for_collision_with_list(self.player_sprite,self.rooms[self.current_room].bullet_list)
-            #TODO recognise hits
+            hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.rooms[self.current_room].bullet_list)
 
+            #TODO recognise hits
+            if self.status_bar.health <=0:
+                self.current_state = settings.GAME_OVER
             self.physics_engine.update()
             if self.physics_engine.can_jump():
                 self.DOUBLE_JUMP_AVAILABLE = True
@@ -320,7 +319,20 @@ class MyGame(arcade.Window):
         self.rooms[self.current_room].own_bullet_list.append(shot.Shot(self.player_direction,self.player_sprite.center_x,self.player_sprite.center_y))
         arcade.sound.play_sound(sounds.shot)
 
+    def update_enemys(self):
+        for en in self.rooms[self.current_room].enemy_list:
+            hit_list = arcade.check_for_collision_with_list(en, self.rooms[self.current_room].own_bullet_list)
+            if len(hit_list) > 0:
+                en.kill()
+                for bullet in hit_list:
+                    bullet.kill()
 
+    def enemy_bullets(self):
+        hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.rooms[self.current_room].bullet_list)
+        for hit in hit_list:
+            hit.kill()
+            self.status_bar.health = self.status_bar.health -1
+            arcade.play_sound(sounds.damage)
 
 def main():
     MyGame(settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT)
