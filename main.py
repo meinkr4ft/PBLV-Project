@@ -16,6 +16,7 @@ import rooms
 from status_bar import StatusBar
 from room import Room
 import sounds
+import player
 
 import shot
 import enemy
@@ -81,7 +82,7 @@ class MyGame(arcade.Window):
         """
 
         # Set up the player
-        self.player_sprite = arcade.Sprite("images/character.png", settings.PLAYER_SCALING)
+        self.player_sprite = player.player
         self.player_sprite.center_x = 300
         self.player_sprite.center_y = 300
         self.status_bar = StatusBar()
@@ -244,6 +245,8 @@ class MyGame(arcade.Window):
 
         # Only move and do things if the game is running.
         elif self.current_state == settings.GAME_RUNNING:
+            self.player_sprite.update()
+            self.player_sprite.update_animation()
 
             self.physics_engine.update()
             if self.physics_engine.can_jump():
@@ -263,6 +266,7 @@ class MyGame(arcade.Window):
                                                                      self.rooms[self.current_room].wall_list,
                                                                      gravity_constant=settings.GRAVITY)
                 self.player_sprite.center_x = settings.SCREEN_WIDTH
+
 
 
 def main():
