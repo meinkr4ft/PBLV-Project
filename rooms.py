@@ -133,7 +133,7 @@ def setup_room_3():
     from_to(room.wall_list, src, 2, 0, 8, arcade.key.UP)
     from_to(room.wall_list, src, 14, 1, 9, arcade.key.RIGHT)
     from_to(room.wall_list, src, 9, 6, 0, arcade.key.RIGHT)
-    from_to(room.wall_list, src, 8, 14, 2, arcade.key.RIGHT)
+    from_to(room.wall_list, src, 8, 14, 2, arcade.key.UP)
 
     room.background = arcade.load_texture("images/background.png")
 
