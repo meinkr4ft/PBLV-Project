@@ -82,7 +82,8 @@ class MyGame(arcade.Window):
         """
 
         # Set up the player
-        self.player_sprite = player.player
+        #self.player_sprite = player.player
+        self.player_sprite = arcade.Sprite("images/character.png", settings.PLAYER_SCALING)
         self.player_sprite.center_x = 300
         self.player_sprite.center_y = 300
         self.status_bar = StatusBar()
@@ -92,7 +93,9 @@ class MyGame(arcade.Window):
         self.rooms.append(room)
         room = rooms.setup_room_2()
         self.rooms.append(room)
-        room = rooms.setup_room_2()
+        room = rooms.setup_room_3()
+        self.rooms.append(room)
+        room = rooms.setup_room_4()
         self.rooms.append(room)
 
         self.current_room = 0
@@ -255,8 +258,8 @@ class MyGame(arcade.Window):
 
         # Only move and do things if the game is running.
         elif self.current_state == settings.GAME_RUNNING:
-            self.player_sprite.update()
-            self.player_sprite.update_animation()
+            #self.player_sprite.update()
+            #self.player_sprite.update_animation()
 
             self.physics_engine.update()
             if self.physics_engine.can_jump():
@@ -280,6 +283,16 @@ class MyGame(arcade.Window):
                     self.current_room = 1
                     self.setup_engine()
                 self.player_sprite.center_x = settings.SCREEN_WIDTH
+            elif self.player_sprite.center_y < 0:
+                if self.current_room == 2:
+                    self.current_room = 3
+                    self.setup_engine()
+                self.player_sprite.center_y = settings.GAME_HEIGHT
+            elif self.player_sprite.center_y > settings.GAME_HEIGHT:
+                if self.current_room == 3:
+                    self.current_room =  2
+                    self.setup_engine()
+                self.player_sprite.center_y = 0
 
 
 

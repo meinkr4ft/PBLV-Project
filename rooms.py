@@ -110,3 +110,60 @@ def setup_room_2():
     room.background = arcade.load_texture("images/background.png")
 
     return room
+
+def setup_room_3():
+    """
+    Create and return room 2.
+    """
+    room = Room()
+
+    """ Set up the game and initialize the variables. """
+    # Sprite lists
+    room.wall_list = arcade.SpriteList()
+    room.item_list = arcade.SpriteList()
+    room.spikes_list = arcade.SpriteList()
+
+    src = "images/wall.png"
+    from_to(room.wall_list, src, 6, 0, 0, arcade.key.UP)
+    from_to(room.wall_list, src, 2, 0, 8, arcade.key.UP)
+    from_to(room.wall_list, src, 9, 3, 0, arcade.key.UP)
+    from_to(room.wall_list, src, 1, 4, 3, arcade.key.UP)
+    from_to(room.wall_list, src, 1, 4, 6, arcade.key.UP)
+
+    from_to(room.wall_list, src, 2, 0, 8, arcade.key.UP)
+    from_to(room.wall_list, src, 14, 1, 9, arcade.key.RIGHT)
+    from_to(room.wall_list, src, 9, 6, 0, arcade.key.RIGHT)
+    from_to(room.wall_list, src, 8, 14, 2, arcade.key.RIGHT)
+
+    room.background = arcade.load_texture("images/background.png")
+
+    return room
+
+def setup_room_4():
+    """
+    Create and return room 2.
+    """
+    room = Room()
+
+    """ Set up the game and initialize the variables. """
+    # Sprite lists
+    room.wall_list = arcade.SpriteList()
+    room.item_list = arcade.SpriteList()
+    room.spikes_list = arcade.SpriteList()
+
+    src = "images/wall.png"
+    from_to(room.wall_list, src, 10, 0, 0, arcade.key.UP)
+    from_to(room.wall_list, src, 14, 1, 0, arcade.key.RIGHT)
+    from_to(room.wall_list, src, 9, 14, 1, arcade.key.UP)
+    from_to(room.wall_list, src, 2, 3, 8, arcade.key.UP)
+    from_to(room.wall_list, src, 9, 4, 7, arcade.key.RIGHT)
+    from_to(room.wall_list, src, 8, 6, 9, arcade.key.RIGHT)
+
+    from_to(room.wall_list, src, 1, 3, 3, arcade.key.RIGHT)
+    from_to(room.wall_list, src, 1, 7, 4, arcade.key.RIGHT)
+    from_to(room.wall_list, src, 1, 10, 4, arcade.key.RIGHT)
+    from_to(room.wall_list, src, 1, 13, 4, arcade.key.RIGHT)
+
+    room.background = arcade.load_texture("images/background.png")
+
+    return room
