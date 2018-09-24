@@ -1,5 +1,6 @@
 import arcade
 import settings
+from enemy import Enemy
 from room import Room
 
 # only up and right
@@ -34,6 +35,21 @@ def setup_room_1():
     room.wall_list = arcade.SpriteList()
     room.spikes_list = arcade.SpriteList()
     room.item_list = arcade.SpriteList()
+    room.enemy_list = arcade.SpriteList()
+    room.bullet_list = arcade.SpriteList()
+
+    #Set Up enemys
+    enemy = Enemy(True,True,120,240)
+    enemy.center_x = 100
+    enemy.center_y = 100
+    room.enemy_list.append(enemy)
+
+    enemy = Enemy(False, True, 120, 240)
+    enemy.center_x = 400
+    enemy.center_y = 100
+    enemy.change_direction()
+    room.enemy_list.append(enemy)
+
 
     # -- Set up the walls
     # Create bottom and top row of boxes

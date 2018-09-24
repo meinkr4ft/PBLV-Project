@@ -1,5 +1,5 @@
 import arcade
-SPRITE_SCALING = 0.5
+SPRITE_SCALING = 1.5
 SPRITE_NATIVE_SIZE = 128
 SPRITE_SIZE = int(SPRITE_NATIVE_SIZE * SPRITE_SCALING)
 
@@ -15,7 +15,7 @@ RIGHT_MARGIN = 150
 
 class Enemy(arcade.Sprite):
 
-    def __init__(self):
+    def __init__(self,moveing,shooting,shooting_intervall,moveing_intervall):
         super().__init__()
 
 
@@ -27,10 +27,16 @@ class Enemy(arcade.Sprite):
         # By default, face right.
         self.texture = self.texture_right
         self.direction = 1
+        self.shooting = shooting
+        self.moveing = moveing
+        self.shooting_intervall = shooting_intervall
+        self.moveing_intervall = moveing_intervall
+
 
 
     def update(self):
-        self.change_x = ENEMY_SPEED * self.direction
+        if self.moveing:
+            self.change_x = ENEMY_SPEED * self.direction
         self.center_x += self.change_x
         self.center_y += self.change_y
 
@@ -52,3 +58,5 @@ class Enemy(arcade.Sprite):
 
     def change_direction(self):
         self.direction = self.direction * -1
+        if self.direction == -1:
+            self.texture = self.texture_left

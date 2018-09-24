@@ -68,6 +68,7 @@ class MyGame(arcade.Window):
         self.RIGHT_PRESSED = False
         self.game_over = False
         self.rooms = None
+        self.frame_count = 0
 
         # STEP 1: Put each instruction page in an image. Make sure the image
         # matches the dimensions of the window, or it will stretch and look
@@ -140,6 +141,8 @@ class MyGame(arcade.Window):
         arcade.draw_text(output, 310, 300, arcade.color.WHITE, 24)
 
 
+
+
     def draw_lives(self):
         pass
 
@@ -161,6 +164,7 @@ class MyGame(arcade.Window):
             self.draw_pause()
 
         elif self.current_state == settings.GAME_RUNNING:
+
             draw_background(self.rooms[self.current_room].background)
             self.status_bar.sprite_list.draw()
             for l in self.rooms[self.current_room].get_lists():
@@ -258,9 +262,14 @@ class MyGame(arcade.Window):
             self.player_sprite.update()
             self.player_sprite.update_animation()
 
+            self.rooms[self.current_room].update()
+            hit_list = arcade.check_for_collision_with_list(self.player_sprite,self.rooms[self.current_room].bullet_list)
+            #TODO recognise hits
+
             self.physics_engine.update()
             if self.physics_engine.can_jump():
                 self.DOUBLE_JUMP_AVAILABLE = True
+
 
             # Do some logic here to figure out what room we are in, and if we need to go
             # to a different room.
