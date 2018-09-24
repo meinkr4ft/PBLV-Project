@@ -21,8 +21,8 @@ class Enemy(arcade.Sprite):
 
         # Load a left facing texture and a right facing texture.
         # mirrored=True will mirror the image we load.
-        self.texture_left = arcade.load_texture("images/spezi.png", mirrored=True, scale=SPRITE_SCALING)
-        self.texture_right = arcade.load_texture("images/spezi.png", scale=SPRITE_SCALING)
+        self.texture_left = arcade.load_texture("images/enemy.png", mirrored=True, scale=SPRITE_SCALING)
+        self.texture_right = arcade.load_texture("images/enemy.png", scale=SPRITE_SCALING)
 
         # By default, face right.
         self.texture = self.texture_right
