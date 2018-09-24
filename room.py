@@ -1,3 +1,5 @@
+import arcade
+
 import enemy
 import shot
 class Room:
@@ -8,11 +10,12 @@ class Room:
 
     def __init__(self):
         # You may want many lists. Lists for coins, monsters, etc.
-        self.wall_list = None
-        self.spikes_list = None
-        self.enemy_list = None
-        self.item_list = None
-        self.bullet_list = None
+        self.wall_list = arcade.SpriteList()
+        self.spikes_list = arcade.SpriteList()
+        self.enemy_list = arcade.SpriteList()
+        self.item_list = arcade.SpriteList()
+        self.bullet_list = arcade.SpriteList()
+        self.own_bullet_list = arcade.SpriteList()
         self.frame_count = 0
 
         # This holds the background images. If you don't want changing
@@ -31,6 +34,8 @@ class Room:
             ret.append(self.item_list)
         if (self.bullet_list is not None):
             ret.append(self.bullet_list)
+        if (self.own_bullet_list is not None):
+            ret.append(self.own_bullet_list)
         return ret
     def update(self):
         #frame count as timer

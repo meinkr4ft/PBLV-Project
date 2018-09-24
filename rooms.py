@@ -31,12 +31,7 @@ def setup_room_1():
     room = Room()
 
     """ Set up the game and initialize the variables. """
-    # Sprite lists
-    room.wall_list = arcade.SpriteList()
-    room.spikes_list = arcade.SpriteList()
-    room.item_list = arcade.SpriteList()
-    room.enemy_list = arcade.SpriteList()
-    room.bullet_list = arcade.SpriteList()
+   
 
     #Set Up enemys
     enemy = Enemy(True,True,120,240)

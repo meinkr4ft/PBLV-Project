@@ -69,6 +69,7 @@ class MyGame(arcade.Window):
         self.game_over = False
         self.rooms = None
         self.frame_count = 0
+        self.player_direction = 1
 
         # STEP 1: Put each instruction page in an image. Make sure the image
         # matches the dimensions of the window, or it will stretch and look
@@ -84,7 +85,8 @@ class MyGame(arcade.Window):
 
         # Set up the player
         #self.player_sprite = player.player
-        self.player_sprite = arcade.Sprite("images/character.png", settings.PLAYER_SCALING)
+        #self.player_sprite = arcade.Sprite("images/character.png", settings.PLAYER_SCALING)
+        self.player_sprite = player.player
         self.player_sprite.center_x = 300
         self.player_sprite.center_y = 300
         self.status_bar = StatusBar()
@@ -209,6 +211,8 @@ class MyGame(arcade.Window):
                 self.current_state = settings.GAME_RUNNING
 
         elif self.current_state == settings.GAME_RUNNING:
+            if key == arcade.key.SPACE:
+                self.shoot()
             if key == arcade.key.ESCAPE:
                 self.current_state = settings.PAUSE
             elif key == arcade.key.UP or key == arcade.key.W:
@@ -219,9 +223,11 @@ class MyGame(arcade.Window):
                     self.DOUBLE_JUMP_AVAILABLE = False
                     self.player_sprite.change_y = settings.SECOND_JUMP_SPEED
             elif key == arcade.key.LEFT or key == arcade.key.A:
+                self.player_direction = -1
                 self.LEFT_PRESSED = True
                 self.player_sprite.change_x = - settings.MOVEMENT_SPEED
             elif key == arcade.key.RIGHT or key == arcade.key.D:
+                self.player_direction = 1
                 self.RIGHT_PRESSED = True
                 self.player_sprite.change_x = settings.MOVEMENT_SPEED
             elif key == settings.WEAPON_SWAP_KEY:
@@ -262,10 +268,10 @@ class MyGame(arcade.Window):
 
         # Only move and do things if the game is running.
         elif self.current_state == settings.GAME_RUNNING:
-            #self.player_sprite.update()
-            #self.player_sprite.update_animation()
+            self.player_sprite.update_animation()
 
             self.rooms[self.current_room].update()
+            self.spikes()
             hit_list = arcade.check_for_collision_with_list(self.player_sprite,self.rooms[self.current_room].bullet_list)
             #TODO recognise hits
 
@@ -302,6 +308,17 @@ class MyGame(arcade.Window):
                     self.current_room =  2
                     self.setup_engine()
                 self.player_sprite.center_y = 0
+
+    def spikes(self):
+        hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.rooms[self.current_room].spikes_list)
+        if len(hit_list) > 0:
+            self.player_sprite.change_y = 5
+            self.status_bar.health = self.status_bar.health - 1
+            arcade.sound.play_sound(sounds.damage)
+
+    def shoot(self):
+        self.rooms[self.current_room].own_bullet_list.append(shot.Shot(self.player_direction,self.player_sprite.center_x,self.player_sprite.center_y))
+        arcade.sound.play_sound(sounds.shot)
 
 
 
