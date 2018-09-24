@@ -34,4 +34,4 @@ player.walk_left_textures.append(arcade.load_texture("images/character3.png",
 player.walk_left_textures.append(arcade.load_texture("images/character4.png",
                                                      scale=settings.PLAYER_SCALING, mirrored=True))
 
-player.texture_change_distance = 20
+player.texture_change_distance = 30
