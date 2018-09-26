@@ -378,10 +378,9 @@ class MyGame(arcade.Window):
                     self.i_frames = 60
 
     def shoot(self):
-        self.rooms[self.current_room].own_bullet_list.append(shot.Shot(self.shot_texture,self.player_direction,self.player_sprite.center_x,self.player_sprite.center_y))
-        arcade.sound.play_sound(sounds.shot)
         if self.bullet_count < settings.BULLET_MAX:
             self.bullet_count+=1
+            print(self.bullet_count)
             self.rooms[self.current_room].own_bullet_list.append(shot.Shot(self.shot_texture,self.player_direction,self.player_sprite.center_x,self.player_sprite.center_y))
             arcade.sound.play_sound(sounds.shot)
 
