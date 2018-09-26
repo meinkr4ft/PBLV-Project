@@ -74,7 +74,7 @@ def setup_room_1():
                 wall.bottom = y
                 room.wall_list.append(wall)
 
-    heart = arcade.Sprite("images/heart_full1.png", settings.SPRITE_SCALING)
+    heart = arcade.Sprite("images/spezi.png", 0.25)
     heart.center_x = 12 * settings.SPRITE_SIZE
     heart.bottom = 1 * settings.SPRITE_SIZE
     room.item_list.append(heart)

@@ -59,6 +59,7 @@ class MyGame(arcade.Window):
         self.rooms = None
         self.frame_count = 0
         self.player_direction = 1
+        self.i_frames = 0
 
         # STEP 1: Put each instruction page in an image. Make sure the image
         # matches the dimensions of the window, or it will stretch and look
@@ -263,15 +264,16 @@ class MyGame(arcade.Window):
 
         # Only move and do things if the game is running.
         elif self.current_state == settings.GAME_RUNNING:
+            if self.i_frames > 0:
+                self.i_frames -= 1
             self.status_bar.update_sprites()
             self.player_sprite.update_animation()
             self.update_enemys()
             self.enemy_bullets()
             self.rooms[self.current_room].update()
             self.spikes()
-            hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.rooms[self.current_room].bullet_list)
+            self.pick_up_items()
 
-            #TODO recognise hits
             if self.status_bar.health <=0:
                 self.current_state = settings.GAME_OVER
             self.physics_engine.update()
@@ -312,8 +314,10 @@ class MyGame(arcade.Window):
         hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.rooms[self.current_room].spikes_list)
         if len(hit_list) > 0:
             self.player_sprite.change_y = 5
-            self.status_bar.health = self.status_bar.health - 1
-            arcade.sound.play_sound(sounds.damage)
+            if self.i_frames == 0:
+                self.status_bar.health = self.status_bar.health - 1
+                arcade.play_sound(sounds.damage)
+                self.i_frames += 15
 
     def shoot(self):
         self.rooms[self.current_room].own_bullet_list.append(shot.Shot(self.player_direction,self.player_sprite.center_x,self.player_sprite.center_y))
@@ -333,6 +337,20 @@ class MyGame(arcade.Window):
             hit.kill()
             self.status_bar.health = self.status_bar.health -1
             arcade.play_sound(sounds.damage)
+        hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.rooms[self.current_room].enemy_list)
+        for hit in hit_list:
+            if self.i_frames == 0:
+                        self.status_bar.health = self.status_bar.health -1
+                        arcade.play_sound(sounds.damage)
+                        self.i_frames += 20
+
+
+
+    def pick_up_items(self):
+        hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.rooms[self.current_room].item_list)
+        for item in hit_list:
+            item.kill()
+            self.status_bar.health += 1
 
 def main():
     MyGame(settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT)
