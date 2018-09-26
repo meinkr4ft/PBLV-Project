@@ -293,7 +293,6 @@ class MyGame(arcade.Window):
                 self.i_frames -= 1
             if self.boos_lifes <= 0:
                 self.current_state = settings.GAME_WON
-            self.status_bar.update_sprites()
             self.player_sprite.update_animation()
             self.update_enemys()
             self.enemy_bullets()
@@ -392,13 +391,9 @@ class MyGame(arcade.Window):
             if len(hit_list) > 0:
                 if self.current_room == BOSS_ROOM:
                     for bullet in hit_list:
-                        bullet.kill()
                         self.boos_lifes -=1
-                    else:
+                else:
                     en.kill()
-                    for bullet in hit_list:
-                        bullet.kill()
-                en.kill()
                 for bullet in hit_list:
                     if self.bullet_count > 0:
                         self.bullet_count -=1
