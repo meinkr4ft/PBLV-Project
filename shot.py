@@ -1,10 +1,10 @@
 import arcade
 BULLET_SPEED = 5
 class Shot(arcade.Sprite):
-    def __init__(self,direction,x,y):
+    def __init__(self,texture,direction,x,y):
         super().__init__()
         self.direction =  direction
-        self.texture = arcade.load_texture("images/bullet.png")
+        self.texture = texture
         self.center_x = x
         self.center_y = y
 

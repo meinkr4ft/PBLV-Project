@@ -49,6 +49,6 @@ class Room:
         #create bullets
             if en.shooting:
                 if self.frame_count%en.shooting_intervall == 0:
-                    self.bullet_list.append(shot.Shot(en.direction, en.center_x, en.center_y))
+                    self.bullet_list.append(shot.Shot(en.shot_texture,en.direction, en.center_x, en.center_y))
         for l in self.get_lists():
             l.update()
