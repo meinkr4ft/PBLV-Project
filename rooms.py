@@ -102,7 +102,7 @@ def setup_room_2():
     room.spikes_list = arcade.SpriteList()
     room.enemy_list  = arcade.SpriteList()
 
-    enemy = Enemy(False, True, 5, 0)
+    enemy = Enemy(False, True, 100, 0)
     enemy.bottom = 1*settings.SPRITE_SIZE
     enemy.left = 12*settings.SPRITE_SIZE
     enemy.change_direction()

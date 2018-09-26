@@ -93,6 +93,7 @@ class MyGame(arcade.Window):
         self.rooms.append(room)
 
         self.current_room = 0
+        self.bullet_count = 0
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
                                                              self.rooms[self.current_room].wall_list,
@@ -185,6 +186,11 @@ class MyGame(arcade.Window):
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
                                                                          self.rooms[self.current_room].wall_list,
                                                                          gravity_constant=settings.GRAVITY)
+
+    def kill_bullets(self):
+        self.rooms[self.current_room].own_bullet_list = arcade.SpriteList()
+        self.rooms[self.current_room].bullet_list = arcade.SpriteList()
+        self.bullet_count = 0
 
 
     def on_mouse_motion(self, x, y, dx, dy):
@@ -288,27 +294,33 @@ class MyGame(arcade.Window):
             # to a different room.
             if self.player_sprite.center_x > settings.SCREEN_WIDTH:
                 if self.current_room == 0:
+                    self.kill_bullets()
                     self.current_room = 1
                     self.setup_engine()
                 elif self.current_room == 1:
+                    self.kill_bullets()
                     self.current_room = 2
                     self.setup_engine()
                 self.player_sprite.center_x = 0
             elif self.player_sprite.center_x < 0:
                 if self.current_room == 1:
+                    self.kill_bullets()
                     self.current_room = 0
                     self.setup_engine()
                 elif self.current_room == 2:
+                    self.kill_bullets()
                     self.current_room = 1
                     self.setup_engine()
                 self.player_sprite.center_x = settings.SCREEN_WIDTH
             elif self.player_sprite.center_y < 0:
                 if self.current_room == 2:
+                    self.kill_bullets()
                     self.current_room = 3
                     self.setup_engine()
                 self.player_sprite.center_y = settings.GAME_HEIGHT
             elif self.player_sprite.center_y > settings.GAME_HEIGHT:
                 if self.current_room == 3:
+                    self.kill_bullets()
                     self.current_room =  2
                     self.setup_engine()
                 self.player_sprite.center_y = 0
@@ -316,11 +328,13 @@ class MyGame(arcade.Window):
     def update_bullets(self):
         for b in self.rooms[self.current_room].own_bullet_list:
             if b.center_x < 0 or b.center_x > settings.SCREEN_WIDTH:
-                self.bullet_count -=1
+                if self.bullet_count > 0:
+                    self.bullet_count -=1
                 b.kill()
             hit_list = arcade.check_for_collision_with_list(b, self.rooms[self.current_room].wall_list)
             for h in hit_list:
-                self.bullet_count-=1
+                if self.bullet_count > 0:
+                    self.bullet_count-=1
                 b.kill()
         for b in self.rooms[self.current_room].bullet_list:
             if b.center_x < 0 or b.center_x > settings.SCREEN_WIDTH:
@@ -352,7 +366,8 @@ class MyGame(arcade.Window):
             if len(hit_list) > 0:
                 en.kill()
                 for bullet in hit_list:
-                    self.bullet_count -=1
+                    if self.bullet_count > 0:
+                        self.bullet_count -=1
                     bullet.kill()
 
     def enemy_bullets(self):
