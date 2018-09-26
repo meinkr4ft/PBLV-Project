@@ -347,7 +347,8 @@ class MyGame(arcade.Window):
     def spikes(self):
         hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.rooms[self.current_room].spikes_list)
         for s in hit_list:
-            if self.player_sprite.right <= s.left or self.player_sprite.left <= s.right:
+            if self.physics_engine.can_jump() and self.player_sprite.left >= s.left and self.player_sprite.right <= s.right \
+                    or not self.physics_engine.can_jump():
                 self.player_sprite.change_y = 10
                 if self.i_frames == 0:
                     self.status_bar.health = self.status_bar.health - 1
