@@ -19,11 +19,11 @@ class StatusBar:
         self.weapon_count = 3
         self.weapons = [0,0,0]
 
-        self.sprite_list = arcade.SpriteList()
-        self.update_sprites()
+        self.hearts = []
+        self.slot_list = arcade.SpriteList()
+        self.setup()
 
-    def update_sprites(self):
-        self.sprite_list = arcade.SpriteList()
+    def setup(self):
         start_index = 0
         health_remaining = self.health
         # hearts
@@ -35,7 +35,7 @@ class StatusBar:
             heart = arcade.Sprite(src)
             heart.top = SCREEN_HEIGHT
             heart.left = i*SPRITE_NATIVE_SIZE
-            self.sprite_list.append(heart)
+            self.hearts.append(heart)
 
         start_index += self.max_health +1
         # weapons
@@ -45,13 +45,36 @@ class StatusBar:
             weapon = arcade.Sprite(src)
             weapon.top = SCREEN_HEIGHT
             weapon.left = i*SPRITE_NATIVE_SIZE
-            self.sprite_list.append(weapon)
+            self.slot_list.append(weapon)
 
             if self.selected == index:
                 select_arrow = arcade.Sprite("images/select_arrow.png")
                 select_arrow.top = SCREEN_HEIGHT - SPRITE_NATIVE_SIZE
                 select_arrow.left = weapon.left
-                self.sprite_list.append(select_arrow)
+                self.slot_list.append(select_arrow)
+
+    def draw_hearts(self):
+        for h in self.hearts:
+            h.draw()
+
+    def update_hearts(self):
+        for i in range(len(self.hearts)):
+            self.hearts[i].kill()
+
+        start_index = 0
+        health_remaining = self.health
+        # hearts
+        for i in range(start_index, self.max_health):
+            src = "images/heart_full1.png"
+            if health_remaining <= 0:
+                src = "images/heart_empty1.png"
+            health_remaining -= 1
+            heart = arcade.Sprite(src)
+            heart.top = SCREEN_HEIGHT
+            heart.left = i*SPRITE_NATIVE_SIZE
+            self.hearts.append(heart)
+
+
 
     def get_weapon_src(self, slot):
         if self.weapons[slot] == 0:

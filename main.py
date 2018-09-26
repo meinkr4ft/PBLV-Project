@@ -19,7 +19,6 @@ BOSS_ROOM = 5
 
 
 class MyGame(arcade.Window):
-
     """
     Main application class.
     """
@@ -63,7 +62,7 @@ class MyGame(arcade.Window):
         self.player_direction = 1
         self.i_frames = 0
         self.shot_texture = arcade.load_texture("images/bullet.png")
-
+        self.bullet_count = 0
         # STEP 1: Put each instruction page in an image. Make sure the image
         # matches the dimensions of the window, or it will stretch and look
         # ugly. You can also do something similar if you want a page between
@@ -86,7 +85,7 @@ class MyGame(arcade.Window):
         self.rooms = []
         self.boos_lifes = 100
 
-        room = rooms.setup_room_boss()
+        room = rooms.setup_room_1()
         self.rooms.append(room)
         room = rooms.setup_room_2()
         self.rooms.append(room)
@@ -175,7 +174,8 @@ class MyGame(arcade.Window):
         elif self.current_state == settings.GAME_RUNNING:
 
             draw_background(self.rooms[self.current_room].background)
-            self.status_bar.sprite_list.draw()
+            self.status_bar.slot_list.draw()
+            self.status_bar.draw_hearts()
             for l in self.rooms[self.current_room].get_lists():
                 l.draw()
             # self.rooms[self.current_room].wall_list.draw()
@@ -374,6 +374,7 @@ class MyGame(arcade.Window):
                 self.player_sprite.change_y = 10
                 if self.i_frames == 0:
                     self.status_bar.health = self.status_bar.health - 1
+                    self.status_bar.update_hearts()
                     arcade.play_sound(sounds.damage)
                     self.i_frames = 60
 
@@ -409,11 +410,13 @@ class MyGame(arcade.Window):
             hit.kill()
             if self.i_frames == 0:
                 self.status_bar.health = self.status_bar.health -1
+                self.status_bar.update_hearts()
                 arcade.play_sound(sounds.damage)
         hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.rooms[self.current_room].enemy_list)
         for hit in hit_list:
             if self.i_frames == 0:
                         self.status_bar.health = self.status_bar.health -1
+                        self.status_bar.update_hearts()
                         arcade.play_sound(sounds.damage)
                         self.i_frames += 60
 
@@ -425,6 +428,7 @@ class MyGame(arcade.Window):
             for item in hit_list:
                 item.kill()
                 self.status_bar.health += 1
+                self.status_bar.update_hearts()
 
 def main():
     MyGame(settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT)
