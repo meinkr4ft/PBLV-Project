@@ -37,6 +37,7 @@ class Room:
         if (self.own_bullet_list is not None):
             ret.append(self.own_bullet_list)
         return ret
+
     def update(self):
         #frame count as timer
         self.frame_count = self.frame_count + 1

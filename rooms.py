@@ -34,14 +34,16 @@ def setup_room_1():
    
 
     #Set Up enemys
-    enemy = Enemy(True,True,120,240)
-    enemy.center_x = 100
-    enemy.center_y = 100
+
+    enemy = Enemy(False, False, 0, 0)
+    enemy.bottom = 1*settings.SPRITE_SIZE
+    enemy.left = 12*settings.SPRITE_SIZE
+    enemy.change_direction()
     room.enemy_list.append(enemy)
 
-    enemy = Enemy(False, True, 120, 240)
-    enemy.center_x = 400
-    enemy.center_y = 100
+    enemy = Enemy(False, False, 0, 0)
+    enemy.bottom = 1*settings.SPRITE_SIZE
+    enemy.left = 11*settings.SPRITE_SIZE
     enemy.change_direction()
     room.enemy_list.append(enemy)
 
@@ -75,7 +77,7 @@ def setup_room_1():
                 room.wall_list.append(wall)
 
     heart = arcade.Sprite("images/spezi.png", 0.25)
-    heart.center_x = 12 * settings.SPRITE_SIZE
+    heart.right = 14 * settings.SPRITE_SIZE
     heart.bottom = 1 * settings.SPRITE_SIZE
     room.item_list.append(heart)
 
@@ -98,6 +100,13 @@ def setup_room_2():
     room.wall_list = arcade.SpriteList()
     room.item_list = arcade.SpriteList()
     room.spikes_list = arcade.SpriteList()
+    room.enemy_list  = arcade.SpriteList()
+
+    enemy = Enemy(False, True, 5, 0)
+    enemy.bottom = 1*settings.SPRITE_SIZE
+    enemy.left = 12*settings.SPRITE_SIZE
+    enemy.change_direction()
+    room.enemy_list.append(enemy)
 
     src = "images/wall.png"
     from_to(room.wall_list, src, 15, 0, 0, arcade.key.RIGHT)

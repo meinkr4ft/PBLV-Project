@@ -9,15 +9,15 @@ SPRITE_NATIVE_SIZE = settings.SPRITE_NATIVE_SIZE
 class StatusBar:
     def __init__(self):
         # status bar values
-        self.lives = 5
-        self.health = 5
-        self.max_health = 8
+        self.lives = 3
+        self.health = 3
+        self.max_health = 3
         self.health_cap = 10
         self.key_cap = 10
         # 3 types of weapons
         self.selected = 2
         self.weapon_count = 3
-        self.weapons = [1,1,1]
+        self.weapons = [0,0,0]
 
         self.sprite_list = arcade.SpriteList()
         self.update_sprites()
