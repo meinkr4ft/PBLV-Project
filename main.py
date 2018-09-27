@@ -3,13 +3,11 @@ import os
 import settings
 import rooms
 from status_bar import StatusBar
-from room import Room
 import sounds
 import player
 
 import shot
-import enemy
-import random
+
 
 
 def draw_background(background):
@@ -76,8 +74,6 @@ class MyGame(arcade.Window):
         """
 
         # Set up the player
-        #self.player_sprite = player.player
-        #self.player_sprite = arcade.Sprite("images/character.png", settings.PLAYER_SCALING)
         self.player_sprite = player.player
         self.player_sprite.center_x = 300
         self.player_sprite.center_y = 300
@@ -146,15 +142,13 @@ class MyGame(arcade.Window):
         """
         output = "You won!!"
         arcade.draw_text(output, 240, 400, arcade.color.WHITE, 54)
+        arcade.play_sound(sounds.win)
 
         output = "Click to restart"
         arcade.draw_text(output, 310, 300, arcade.color.WHITE, 24)
 
 
 
-
-    def draw_lives(self):
-        pass
 
     # STEP 5: Update the on_draw function to look like this. Adjust according
     # to the number of instruction pages you have.
@@ -182,7 +176,6 @@ class MyGame(arcade.Window):
                 l.draw()
             # self.rooms[self.current_room].wall_list.draw()
             self.player_sprite.draw()
-            self.draw_lives()
 
         elif self.current_state == settings.GAME_OVER:
             self.draw_game_over()
@@ -208,9 +201,6 @@ class MyGame(arcade.Window):
         self.rooms[self.current_room].bullet_list = arcade.SpriteList()
         self.bullet_count = 0
 
-
-    def on_mouse_motion(self, x, y, dx, dy):
-        pass
 
     def on_key_press(self, key, modifiers):
         if self.current_state == settings.INSTRUCTIONS_PAGE:
@@ -259,8 +249,6 @@ class MyGame(arcade.Window):
             #self.setup()
             #self.current_state = settings.GAME_RUNNING
 
-    def pause(self):
-        print("r")
 
     def on_key_release(self, key, modifiers):
         # TODO - Cancel movement only when no key is pressed at all
