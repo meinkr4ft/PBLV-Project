@@ -3,7 +3,7 @@ import settings
 
 class Enemy(arcade.Sprite):
 
-    def __init__(self,moveing,shooting,shooting_intervall,moveing_intervall):
+    def __init__(self,moveing,shooting,moveing_intervall,shooting_intervall):
         super().__init__()
 
 

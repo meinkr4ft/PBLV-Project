@@ -35,13 +35,13 @@ def setup_room_1():
 
     #Set Up enemys
 
-    enemy = Enemy(False, False, 0, 0)
+    enemy = Enemy(False, True, 0, 120)
     enemy.bottom = 1*settings.SPRITE_SIZE
     enemy.left = 12*settings.SPRITE_SIZE
     enemy.change_direction()
     room.enemy_list.append(enemy)
 
-    enemy = Enemy(False, False, 0, 0)
+    enemy = Enemy(False, True, 0, 120)
     enemy.bottom = 1*settings.SPRITE_SIZE
     enemy.left = 11*settings.SPRITE_SIZE
     enemy.change_direction()
@@ -102,11 +102,22 @@ def setup_room_2():
     room.spikes_list = arcade.SpriteList()
     room.enemy_list  = arcade.SpriteList()
 
-    enemy = Enemy(False, True, 100, 0)
+    enemy = Enemy(False, True, 0, 100)
     enemy.bottom = 1*settings.SPRITE_SIZE
     enemy.left = 12*settings.SPRITE_SIZE
     enemy.change_direction()
     room.enemy_list.append(enemy)
+
+    enemy = Enemy(True, True, 160, 70)
+    enemy.bottom = 5 * settings.SPRITE_SIZE
+    enemy.left = 2 * settings.SPRITE_SIZE
+    enemy.change_direction()
+    room.enemy_list.append(enemy)
+
+    heart = arcade.Sprite("images/spezi.png", 0.25)
+    heart.right = 7 * settings.SPRITE_SIZE
+    heart.bottom = 1 * settings.SPRITE_SIZE
+    room.item_list.append(heart)
 
     src = "images/wall.png"
     from_to(room.wall_list, src, 15, 0, 0, arcade.key.RIGHT)
@@ -173,7 +184,9 @@ def setup_room_4():
 
     src = "images/wall.png"
     from_to(room.wall_list, src, 10, 0, 0, arcade.key.UP)
-    from_to(room.wall_list, src, 14, 1, 0, arcade.key.RIGHT)
+    from_to(room.wall_list, src, 4, 1, 0, arcade.key.RIGHT)
+    from_to(room.wall_list, src, 2, 7, 0, arcade.key.RIGHT)
+    from_to(room.wall_list, src, 3, 12, 0, arcade.key.RIGHT)
     from_to(room.wall_list, src, 9, 14, 1, arcade.key.UP)
     from_to(room.wall_list, src, 2, 3, 8, arcade.key.UP)
     from_to(room.wall_list, src, 9, 4, 7, arcade.key.RIGHT)
@@ -184,7 +197,15 @@ def setup_room_4():
     from_to(room.wall_list, src, 1, 10, 4, arcade.key.RIGHT)
     from_to(room.wall_list, src, 1, 13, 4, arcade.key.RIGHT)
 
+    src = "images/spikes.png"
+    from_to(room.spikes_list, src, 2, 5, 0, arcade.key.RIGHT)
+    from_to(room.spikes_list, src, 3, 9, 0, arcade.key.RIGHT)
     room.background = arcade.load_texture("images/background.png")
+
+    enemy = Enemy(False, True, 0, 100)
+    enemy.bottom = 7.7 * settings.SPRITE_SIZE
+    enemy.left = 4 * settings.SPRITE_SIZE
+    room.enemy_list.append(enemy)
 
     return room
 
@@ -200,11 +221,14 @@ def setup_room_boss():
     """ Set up the game and initialize the variables. """
 
     # Set Up enemys
-    enemy = Enemy(False,True,120,120)
+    enemy = Enemy(True,True,260,75)
     enemy.center_x = 700
     enemy.center_y = 110
     enemy.shot_texture = arcade.load_texture("images/stone.png", mirrored=True, scale=0.05)
     enemy.change_direction()
+    enemy.texture_right = arcade.load_texture("images/golem.png", mirrored=False, scale=0.4)
+    enemy.texture_left = arcade.load_texture("images/golem.png", mirrored=True, scale=0.4);
+
     enemy.texture = arcade.load_texture("images/golem.png", mirrored=True, scale=0.4)
     room.enemy_list.append(enemy)
 
@@ -215,7 +239,7 @@ def setup_room_boss():
     for y in (0, settings.GAME_HEIGHT - settings.SPRITE_SIZE):
         # Loop for each box going across
         for x in range(0, settings.SCREEN_WIDTH, settings.SPRITE_SIZE):
-            if not (y == 0 and x >= 7 * settings.SPRITE_SIZE and x <= 9 * settings.SPRITE_SIZE):
+            if not (y == 0 and x >= 7 * settings.SPRITE_SIZE and x <= 9 * settings.SPRITE_SIZE) and not (y == 0 and x >= 3 * settings.SPRITE_SIZE and x <= 4 * settings.SPRITE_SIZE):
                 wall = arcade.Sprite("images/wall.png", settings.SPRITE_SCALING)
                 wall.left = x
                 wall.bottom = y
@@ -226,12 +250,21 @@ def setup_room_boss():
                 spikes.bottom = y
                 room.spikes_list.append(spikes)
 
+    wall = arcade.Sprite("images/wall.png", settings.SPRITE_SCALING)
+    wall.left = 7 * settings.SPRITE_SIZE
+    wall.bottom = 3 * settings.SPRITE_SIZE
+    room.wall_list.append(wall)
+
+    wall = arcade.Sprite("images/wall.png", settings.SPRITE_SCALING)
+    wall.left = 4 * settings.SPRITE_SIZE
+    wall.bottom = 3 * settings.SPRITE_SIZE
+    room.wall_list.append(wall)
     # Create left and right column of boxes
     for x in (0, settings.SCREEN_WIDTH - settings.SPRITE_SIZE):
         # Loop for each box going across
         for y in range(settings.SPRITE_SIZE, settings.GAME_HEIGHT - settings.SPRITE_SIZE, settings.SPRITE_SIZE):
-            # Skip making a block 4 and 5 blocks up on the right side
-            if (y != settings.SPRITE_SIZE * 1 and y != settings.SPRITE_SIZE * 2) or x == 0:
+            # Skip making a block 4 and 5 blocks up on the left side
+            if (y != settings.SPRITE_SIZE * 1 and y != settings.SPRITE_SIZE * 2) or x == settings.SCREEN_WIDTH - settings.SPRITE_SIZE :
                 wall = arcade.Sprite("images/wall.png", settings.SPRITE_SCALING)
                 wall.left = x
                 wall.bottom = y

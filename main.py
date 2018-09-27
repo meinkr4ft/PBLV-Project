@@ -15,7 +15,7 @@ import random
 def draw_background(background):
     arcade.draw_texture_rectangle(settings.SCREEN_WIDTH // 2, settings.SCREEN_HEIGHT // 2,
                                   settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT, background)
-BOSS_ROOM = 5
+BOSS_ROOM = 0
 
 
 class MyGame(arcade.Window):
@@ -85,13 +85,15 @@ class MyGame(arcade.Window):
         self.rooms = []
         self.boos_lifes = 100
 
-        room = rooms.setup_room_1()
+        room = rooms.setup_room_boss()
         self.rooms.append(room)
         room = rooms.setup_room_2()
         self.rooms.append(room)
         room = rooms.setup_room_3()
         self.rooms.append(room)
         room = rooms.setup_room_4()
+        self.rooms.append(room)
+        room = rooms.setup_room_boss()
         self.rooms.append(room)
 
         self.current_room = 0
