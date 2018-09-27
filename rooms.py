@@ -151,6 +151,7 @@ def setup_room_3():
     room.wall_list = arcade.SpriteList()
     room.item_list = arcade.SpriteList()
     room.spikes_list = arcade.SpriteList()
+    room.enemy_list = arcade.SpriteList()
 
     src = "images/wall.png"
     from_to(room.wall_list, src, 6, 0, 0, arcade.key.UP)
@@ -158,6 +159,9 @@ def setup_room_3():
     from_to(room.wall_list, src, 9, 3, 0, arcade.key.UP)
     from_to(room.wall_list, src, 1, 4, 3, arcade.key.UP)
     from_to(room.wall_list, src, 1, 4, 6, arcade.key.UP)
+    from_to(room.wall_list, src, 6, 7, 1, arcade.key.UP)
+    from_to(room.wall_list, src, 5, 8, 6, arcade.key.RIGHT)
+    from_to(room.wall_list, src, 5, 9, 3, arcade.key.RIGHT)
 
     from_to(room.wall_list, src, 2, 0, 8, arcade.key.UP)
     from_to(room.wall_list, src, 14, 1, 9, arcade.key.RIGHT)
@@ -165,6 +169,45 @@ def setup_room_3():
     from_to(room.wall_list, src, 8, 14, 2, arcade.key.UP)
 
     room.background = arcade.load_texture("images/background.png")
+
+    enemy = Enemy(False, True, 160, 70)
+    enemy.bottom = 4 * settings.SPRITE_SIZE
+    enemy.left = 4 * settings.SPRITE_SIZE
+    room.enemy_list.append(enemy)
+
+    enemy = Enemy(False, True, 170, 60)
+    enemy.bottom = 7 * settings.SPRITE_SIZE
+    enemy.left = 4 * settings.SPRITE_SIZE
+    room.enemy_list.append(enemy)
+
+    enemy = Enemy(False, True, 200, 90)
+    enemy.bottom = 7 * settings.SPRITE_SIZE
+    enemy.left = 7 * settings.SPRITE_SIZE
+    enemy.change_direction()
+    room.enemy_list.append(enemy)
+
+    enemy = Enemy(False, True, 100, 80)
+    enemy.bottom = 7 * settings.SPRITE_SIZE
+    enemy.left = 10 * settings.SPRITE_SIZE
+    enemy.change_direction()
+    room.enemy_list.append(enemy)
+
+    enemy = Enemy(False, True, 80, 70)
+    enemy.bottom = 4 * settings.SPRITE_SIZE
+    enemy.left = 9 * settings.SPRITE_SIZE
+    room.enemy_list.append(enemy)
+
+    enemy = Enemy(True, True, 95, 75)
+    enemy.bottom = 4 * settings.SPRITE_SIZE
+    enemy.left = 10 * settings.SPRITE_SIZE
+    room.enemy_list.append(enemy)
+
+    heart = arcade.Sprite("images/spezi.png", 0.25)
+    heart.right = 14 * settings.SPRITE_SIZE
+    heart.bottom = 1 * settings.SPRITE_SIZE
+    room.item_list.append(heart)
+
+
 
     return room
 
