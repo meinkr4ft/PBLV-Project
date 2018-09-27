@@ -134,7 +134,7 @@ class MyGame(arcade.Window):
         output = "Game Over"
         arcade.draw_text(output, 240, 400, arcade.color.WHITE, 54)
 
-        output = "Click to restart"
+        output = "Enter to restart"
         arcade.draw_text(output, 310, 300, arcade.color.WHITE, 24)
     def draw_game_won(self):
         """
@@ -144,7 +144,7 @@ class MyGame(arcade.Window):
         arcade.draw_text(output, 240, 400, arcade.color.WHITE, 54)
         arcade.play_sound(sounds.win)
 
-        output = "Click to restart"
+        output = "Enter to restart"
         arcade.draw_text(output, 310, 300, arcade.color.WHITE, 24)
 
 
