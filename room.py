@@ -1,7 +1,7 @@
 import arcade
-
-import enemy
+import settings
 import shot
+import random
 class Room:
     """
     This class holds all the information about the
@@ -52,3 +52,11 @@ class Room:
                     self.bullet_list.append(shot.Shot(en.shot_texture,en.direction, en.center_x, en.center_y))
         for l in self.get_lists():
             l.update()
+
+    def update_drops(self):
+        if self.frame_count%settings.DROP_INTERVAL==0:
+            stone = arcade.Sprite("images/stonesmall.png")
+            stone.top = settings.GAME_HEIGHT
+            stone.center_x = random.randrange(2*settings.SPRITE_SIZE, 12*settings.SPRITE_SIZE, settings.SPRITE_SIZE)
+            stone.change_y = - 3
+            self.bullet_list.append(stone)

@@ -15,7 +15,7 @@ import random
 def draw_background(background):
     arcade.draw_texture_rectangle(settings.SCREEN_WIDTH // 2, settings.SCREEN_HEIGHT // 2,
                                   settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT, background)
-BOSS_ROOM = 0
+BOSS_ROOM = 4
 
 
 class MyGame(arcade.Window):
@@ -85,7 +85,7 @@ class MyGame(arcade.Window):
         self.rooms = []
         self.boos_lifes = 100
 
-        room = rooms.setup_room_boss()
+        room = rooms.setup_room_1()
         self.rooms.append(room)
         room = rooms.setup_room_2()
         self.rooms.append(room)
@@ -255,9 +255,9 @@ class MyGame(arcade.Window):
             if key == arcade.key.RETURN:
                 self.setup()
                 self.current_state = settings.GAME_RUNNING
-        elif self.current_state == settings.GAME_WON:
-            self.setup()
-            self.current_state = settings.GAME_RUNNING
+        #elif self.current_state == settings.GAME_WON:
+            #self.setup()
+            #self.current_state = settings.GAME_RUNNING
 
     def pause(self):
         print("r")
@@ -295,6 +295,8 @@ class MyGame(arcade.Window):
                 self.i_frames -= 1
             if self.boos_lifes <= 0:
                 self.current_state = settings.GAME_WON
+            if self.current_room == BOSS_ROOM and self.boos_lifes <= 50:
+                self.rooms[self.current_room].update_drops()
             self.player_sprite.update_animation()
             self.update_enemys()
             self.enemy_bullets()
@@ -316,6 +318,7 @@ class MyGame(arcade.Window):
             # Do some logic here to figure out what room we are in, and if we need to go
             # to a different room.
             if self.player_sprite.center_x > settings.SCREEN_WIDTH:
+                self.player_sprite.center_x = 0
                 if self.current_room == 0:
                     self.kill_bullets()
                     self.current_room = 1
@@ -324,7 +327,12 @@ class MyGame(arcade.Window):
                     self.kill_bullets()
                     self.current_room = 2
                     self.setup_engine()
-                self.player_sprite.center_x = 0
+                elif self.current_room == 2:
+                    self.player_sprite.bottom =  5*settings.SPRITE_SIZE
+                    self.player_sprite.left = 4*settings.SPRITE_SIZE
+                    self.kill_bullets()
+                    self.current_room = 4
+                    self.setup_engine()
             elif self.player_sprite.center_x < 0:
                 if self.current_room == 1:
                     self.kill_bullets()
@@ -359,13 +367,14 @@ class MyGame(arcade.Window):
                 if self.bullet_count > 0:
                     self.bullet_count-=1
                 b.kill()
-        for b in self.rooms[self.current_room].bullet_list:
-            if b.center_x < 0 or b.center_x > settings.SCREEN_WIDTH:
-                b.kill()
-            hit_list = arcade.check_for_collision_with_list(b, self.rooms[self.current_room].wall_list)
-            for h in hit_list:
-                b.kill()
 
+        for b in self.rooms[self.current_room].bullet_list:
+            if b.center_x < 0 or b.center_y < 0 or b.center_x > settings.SCREEN_WIDTH:
+                b.kill()
+            if self.current_room != BOSS_ROOM:
+                hit_list = arcade.check_for_collision_with_list(b, self.rooms[self.current_room].wall_list)
+                for h in hit_list:
+                    b.kill()
 
     def spikes(self):
         hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.rooms[self.current_room].spikes_list)
@@ -382,7 +391,6 @@ class MyGame(arcade.Window):
     def shoot(self):
         if self.bullet_count < settings.BULLET_MAX:
             self.bullet_count+=1
-            print(self.bullet_count)
             self.rooms[self.current_room].own_bullet_list.append(shot.Shot(self.shot_texture,self.player_direction,self.player_sprite.center_x,self.player_sprite.center_y))
             arcade.sound.play_sound(sounds.shot)
 
@@ -408,6 +416,7 @@ class MyGame(arcade.Window):
                 self.status_bar.health = self.status_bar.health -1
                 self.status_bar.update_hearts()
                 arcade.play_sound(sounds.damage)
+                self.i_frames += 60
         hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.rooms[self.current_room].enemy_list)
         for hit in hit_list:
             if self.i_frames == 0:
